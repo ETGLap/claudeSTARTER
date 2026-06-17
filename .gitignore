@@ -1,0 +1,39 @@
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# iOS
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Android
+.gradle/
+.idea/
+*.iml
+build/
+local.properties
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.Identifier
+
+# Node modules
+node_modules/
+package-lock.json
+npm-debug.log
+
+# IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Environment
+.env
+.env.local
+config.env
