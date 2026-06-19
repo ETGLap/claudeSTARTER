@@ -20,7 +20,7 @@ Hooks trigger. Agents review. Checklists gate. Context remembers.
 1. Read this file + `.claude/context/project-context.md`.
 2. Read nearest local `CLAUDE.md` if present.
 3. `hooks/before-edit.md` → apply `tdd-engineer`.
-4. Plan smallest safe change (`checklists/change-rules.md`).
+4. Plan smallest safe change (`checklists/change-rules.md`); pick the model for the effort (`checklists/model-policy.md`).
 5. Write/edit code.
 6. `hooks/after-edit.md` → apply `quality-reviewer` + `security-reviewer`.
 7. `hooks/before-final.md` → apply `final-reviewer`.
