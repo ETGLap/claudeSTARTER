@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node .claude/notify/notify.js stop" }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node .claude/notify/notify.js notification" }
+        ]
+      }
+    ]
+  }
+}

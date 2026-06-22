@@ -41,4 +41,11 @@ than once · reusable · reduces future mistakes · worth the tokens. Avoid unne
 
 ## Maintenance commands (manual)
 
-`/maintain-claude` · `/update-context` · `/verify-docs`. Match effort to risk.
+`/maintain-claude` · `/update-context` · `/verify-docs` (audit) · `/docs-update` (write
+docs to `docs-vault/` from `.claude/templates/docs/`). Match effort to risk.
+
+## Optional: desktop notifications
+
+`.claude/notify/` fires a desktop popup on task complete / input needed via `Stop` +
+`Notification` hooks in `.claude/settings.json`. Disabled by default — see
+`.claude/notify/README.md`.
