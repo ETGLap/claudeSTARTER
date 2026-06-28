@@ -25,8 +25,8 @@ read CLAUDE.md + context
 |-------|--------------|
 | `CLAUDE.md` | Conductor — rules + lifecycle |
 | `.claude/hooks/` | Lifecycle triggers (before-edit, after-edit, before-final) |
-| `.claude/agents/` | Reviewers (tdd, quality, security, final) |
-| `.claude/checklists/` | Gates (change-rules, quality, test, security) |
+| `.claude/agents/` | Reviewers (tdd, quality, security, final, architecture-guardian) |
+| `.claude/checklists/` | Gates (change-rules, quality, test, security, architecture) |
 | `.claude/context/` | Stable project facts |
 | `.claude/commands/` | Manual maintenance |
 
@@ -35,6 +35,7 @@ read CLAUDE.md + context
 - `/maintain-claude` — review & trim the `.claude/` system
 - `/update-context` — refresh project-context.md
 - `/verify-docs` — check docs against current code
+- `/reuse` — reuse-first discovery before building
 
 ## Local CLAUDE.md
 

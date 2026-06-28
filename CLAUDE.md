@@ -9,6 +9,7 @@ Not an app generator. Never create feature/backend/frontend/api/db/ui generators
 - Prefer TDD: failing test before production code. If impossible, document manual verification.
 - Smallest safe change. No unrelated edits or refactors. No new files/deps without reason.
 - Follow existing project patterns and naming.
+- Reuse first: search for existing code, components, and patterns to reuse or extend before creating new; a duplicate is the last resort.
 - Run tests/lint/build when available; read the output.
 - Never claim verification that did not occur.
 - Report unverified parts and limitations honestly. Keep responses short.
@@ -19,7 +20,7 @@ Hooks trigger. Agents review. Checklists gate. Context remembers.
 
 1. Read this file + `.claude/context/project-context.md`.
 2. Read nearest local `CLAUDE.md` if present.
-3. `hooks/before-edit.md` → apply `tdd-engineer`.
+3. `hooks/before-edit.md` → apply `architecture-guardian` (reuse-first; `checklists/architecture-gates.md`) + `tdd-engineer`.
 4. Plan smallest safe change (`checklists/change-rules.md`); pick the model for the effort (`checklists/model-policy.md`).
 5. Write/edit code.
 6. `hooks/after-edit.md` → apply `quality-reviewer` + `security-reviewer`.
@@ -48,7 +49,8 @@ than once · reusable · reduces future mistakes · worth the tokens. Avoid unne
 
 `/maintain-claude` · `/update-context` · `/verify-docs` (audit) · `/docs-update` (write
 docs to `docs-vault/` from `.claude/templates/docs/`) · `/refactor` (apply
-`refactoring-expert`; opt-in). Match effort to risk.
+`refactoring-expert`; opt-in) · `/reuse` (reuse-first discovery before building). Match
+effort to risk.
 
 ## Optional: desktop notifications
 
