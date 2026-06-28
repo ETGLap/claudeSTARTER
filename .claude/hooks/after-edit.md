@@ -10,3 +10,4 @@ After files are changed.
 - Remove dead/unnecessary code.
 - Document what was verified and what was not.
 - If a feature was added or changed, consider `/docs-update` (suggest, don't auto-run).
+- If a refactor would clearly help, suggest `/refactor` (suggest, don't auto-run).

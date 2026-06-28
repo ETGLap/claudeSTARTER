@@ -8,4 +8,5 @@ Before writing or editing code.
 - Check root + nearest local `CLAUDE.md`.
 - Identify the test needed first.
 - Apply `agents/tdd-engineer`.
+- If the task is a refactor, also apply `agents/refactoring-expert` (behavior-preserving; ensure a test safety net first).
 - Plan smallest safe change. Avoid unrelated edits.
