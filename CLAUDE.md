@@ -26,6 +26,11 @@ Hooks trigger. Agents review. Checklists gate. Context remembers.
 7. `hooks/before-final.md` → apply `final-reviewer`.
 8. Report changed · tested · not verified · risks.
 
+Refactoring is opt-in. When (and only when) a refactor is requested, run `/refactor` →
+apply `agents/refactoring-expert`, gated by `checklists/refactoring-gates.md`. It proceeds
+on trivial, well-scoped refactors and questions you when goal, scope, behavior, or risk is
+unclear. Never refactor unprompted.
+
 ## Local CLAUDE.md
 
 Create one only when a folder has unique rules: architecture, framework, local
@@ -42,7 +47,8 @@ than once · reusable · reduces future mistakes · worth the tokens. Avoid unne
 ## Maintenance commands (manual)
 
 `/maintain-claude` · `/update-context` · `/verify-docs` (audit) · `/docs-update` (write
-docs to `docs-vault/` from `.claude/templates/docs/`). Match effort to risk.
+docs to `docs-vault/` from `.claude/templates/docs/`) · `/refactor` (apply
+`refactoring-expert`; opt-in). Match effort to risk.
 
 ## Optional: desktop notifications
 
