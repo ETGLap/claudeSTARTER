@@ -1,21 +1,25 @@
 # Claude Quality Template
 
 A minimal, framework-independent quality system for Claude Code. It surrounds Claude
-(the builder) with reviewers, gates, memory, and maintenance tools. **Not** an app generator.
+(the builder) with an automatic pipeline, reviewers, gates, tests, memory, and maintenance
+tools. **Not** an app generator.
 
 ## How to use
 
 1. **Copy** `CLAUDE.md` + `.claude/` into your project root.
-2. **Fill** `.claude/context/project-context.md` (or run `/update-context`) with your
+2. **Fill** `.claude/context/project-context.md` (or run `/maintain`) with your
    stack, commands, architecture, and risks.
-3. **Work normally** — just prompt Claude to build or change code. The system guides it:
+3. **(Optional) enable the test-gate** — set `testCommand` + `enabled: true` in
+   `.claude/pipeline.config.json` so finishing is blocked while tests are red.
+4. **Work normally** — just describe the feature. One pipeline runs automatically, no
+   command needed:
 
 ```
 read CLAUDE.md + context
-  → before-edit  : tdd-engineer plans the smallest safe change
-  → write/edit code
-  → after-edit   : quality-reviewer + security-reviewer
-  → before-final : final-reviewer
+  → before-edit  : reuse-check · plan tests · write the failing test (Red)
+  → write code   : smallest code that passes (Green)
+  → after-edit   : refactor your own change · quality · security · re-run tests
+  → before-final : final check · propose /docs if behavior changed
   → report: changed · tested · not verified · risks
 ```
 
@@ -24,18 +28,21 @@ read CLAUDE.md + context
 | Layer | What it does |
 |-------|--------------|
 | `CLAUDE.md` | Conductor — rules + lifecycle |
-| `.claude/hooks/` | Lifecycle triggers (before-edit, after-edit, before-final) |
-| `.claude/agents/` | Reviewers (tdd, quality, security, final, architecture-guardian) |
-| `.claude/checklists/` | Gates (change-rules, quality, test, security, architecture) |
+| `.claude/pipeline/` | Pipeline phases (before-edit, after-edit, before-final) |
+| `.claude/reviewers/` | Reviewers + gates (tdd, quality, security, refactoring, architecture, final) |
+| `.claude/policy/` | Reference policy (model selection) |
 | `.claude/context/` | Stable project facts |
-| `.claude/commands/` | Manual maintenance |
+| `.claude/templates/docs/` | Doc scaffolds for `docs-vault/` |
+| `.claude/commands/` | `/docs`, `/maintain` |
+| `.claude/*.js` + `settings.json` | Real hooks: pipeline injector, test-gate, notify |
 
-## Manual commands
+## Commands
 
-- `/maintain-claude` — review & trim the `.claude/` system
-- `/update-context` — refresh project-context.md
-- `/verify-docs` — check docs against current code
-- `/reuse` — reuse-first discovery before building
+- `/docs` — audit docs vs code, then update `docs-vault/` (propose first)
+- `/maintain` — trim the `.claude/` system + refresh project-context.md
+
+Everything else — reuse, TDD, refactoring your own change, security, docs proposals — is
+automatic.
 
 ## Local CLAUDE.md
 
@@ -44,5 +51,5 @@ security, naming, domain). Include only what differs from root.
 
 ## Scaling
 
-Stays minimal by default. Add agents/hooks/checklists/MCP only on **repeated need** —
+Stays minimal by default. Add reviewers/pipeline/policy/MCP only on **repeated need** —
 not one-offs. Keep every file low-token.

@@ -1,6 +1,6 @@
 # Project context
 
-Stable facts only. Keep short. Update via `/update-context`.
+Stable facts only. Keep short. Update via `/maintain`.
 
 - **Purpose:** <what this project is>
 - **Stack:** <languages, frameworks>

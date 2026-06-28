@@ -8,7 +8,7 @@
 
 ## Shared building blocks
 
-> The reuse map — check here before creating new. Keep current via `/docs-update`.
+> The reuse map — check here before creating new. Keep current via `/docs`.
 
 - **Logic** — shared utils, services, hooks, state, API clients · `<where they live>`
 - **UI** — shared components: buttons, cards, dialogs, forms, nav, layouts · `<where>`

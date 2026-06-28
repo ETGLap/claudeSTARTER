@@ -1,4 +1,4 @@
-# Gate: model selection
+# Policy: model selection
 
 Pick the cheapest model that meets the task's effort. Default to Opus; downgrade
 only when the task is well-scoped and low-risk. Claude cannot switch the main
@@ -15,7 +15,7 @@ session's model — recommend the switch; the user runs `/model`.
 
 ## When to recommend a switch
 
-Judge effort before planning (see `hooks/before-edit.md`):
+Judge effort before planning (see `pipeline/before-edit.md`):
 
 - [ ] Low effort + low risk + clear spec → recommend `sonnet` (or `haiku` if
       trivial) before doing the work.
@@ -27,6 +27,6 @@ Proceed on the current model if the user doesn't switch.
 
 ## Automatic savings (no `/model` needed)
 
-Work delegated to a subagent runs on that subagent's declared model. To make a
-review run cheaper without a switch, give that reviewer a cheaper `model:` in
-its `agents/` definition. Add only on repeated need.
+Work delegated to a subagent runs on that subagent's declared model — e.g. reuse
+discovery via a read-only `Explore` subagent. If you promote a reviewer to a real
+subagent, give it a cheaper `model:`. Add only on repeated need.

@@ -1,4 +1,6 @@
-# Gate: security
+# Security
+
+Proportional to risk. Lens, then gate.
 
 - [ ] Inputs validated.
 - [ ] Auth/authorization correct where relevant.

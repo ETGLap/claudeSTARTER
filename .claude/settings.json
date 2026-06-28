@@ -1,8 +1,16 @@
 {
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node .claude/pipeline-inject.js" }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
+          { "type": "command", "command": "node .claude/test-gate.js" },
           { "type": "command", "command": "node .claude/notify/notify.js stop" }
         ]
       }
