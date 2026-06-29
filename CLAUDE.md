@@ -42,6 +42,8 @@ behavior-preserving and test-gated.
 - `/docs` — audit docs vs code, then update `docs-vault/` from `.claude/templates/docs/`
   (propose first; never overwrite human prose; ADRs append-only).
 - `/maintain` — trim the `.claude/` system + refresh `project-context.md`.
+- `/modernize` — one-time: retrofit an existing project to Conductor standards when you first
+  drop `.claude/` into it (audit → plan → apply on approval).
 
 Everything else is automatic: reuse, TDD, refactor-your-own-change, security, docs proposals.
 

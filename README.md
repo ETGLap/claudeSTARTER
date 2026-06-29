@@ -6,7 +6,8 @@ tools. **Not** an app generator.
 
 ## How to use
 
-1. **Copy** `CLAUDE.md` + `.claude/` into your project root.
+1. **Copy** `CLAUDE.md` + `.claude/` into your project root. *(Existing project with code
+   already? Run `/modernize` once to retrofit it to Conductor standards.)*
 2. **Fill** `.claude/context/project-context.md` (or run `/maintain`) with your
    stack, commands, architecture, and risks.
 3. **(Optional) enable the test-gate** — set `testCommand` + `enabled: true` in
@@ -33,13 +34,14 @@ read CLAUDE.md + context
 | `.claude/policy/` | Reference policy (model selection) |
 | `.claude/context/` | Stable project facts |
 | `.claude/templates/docs/` | Doc scaffolds for `docs-vault/` |
-| `.claude/commands/` | `/docs`, `/maintain` |
+| `.claude/commands/` | `/docs`, `/maintain`, `/modernize` |
 | `.claude/*.js` + `settings.json` | Real hooks: pipeline injector, test-gate, notify |
 
 ## Commands
 
 - `/docs` — audit docs vs code, then update `docs-vault/` (propose first)
 - `/maintain` — trim the `.claude/` system + refresh project-context.md
+- `/modernize` — one-time: retrofit an existing project to Conductor standards (audit → plan → apply)
 
 Everything else — reuse, TDD, refactoring your own change, security, docs proposals — is
 automatic.
