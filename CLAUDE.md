@@ -15,6 +15,8 @@ Not an app generator — never create feature/backend/frontend/api/db/ui generat
   but still get verification and the report.
 - Reuse first: search for existing code and patterns to reuse or extend; a duplicate is
   the last resort.
+- Delegate exploration: information-gathering runs in read-only subagents that return a
+  concise brief; implementation stays in the main session (`policy/delegation.md`).
 - Follow existing project patterns and naming.
 - Run tests/lint/build when available; read the output. Tests must pass before done.
 - Never claim verification that did not occur; report unverified parts honestly.

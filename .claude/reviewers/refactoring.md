@@ -1,6 +1,7 @@
 # Refactoring
 
 Improve structure without changing behavior. Two modes:
+
 - In-pipeline (automatic): the Refactor step of TDD — clean the code you just wrote while
   tests are green. Scope = your own change only.
 - Standalone: pre-existing or unrelated code, on explicit request only — never unprompted;
