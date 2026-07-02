@@ -1,9 +1,7 @@
 # Final
 
-Last check before the response. Lens, then gate.
+Last gate before the response.
 
 - [ ] Requirement satisfied.
 - [ ] Tests/lint/build run; results reported (green required before done).
-- [ ] Risks and anything not verified documented.
-- [ ] No false or unverified claims.
-- [ ] Summary is short and honest.
+- [ ] Risks and anything not verified stated honestly.

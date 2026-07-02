@@ -1,14 +1,13 @@
 # Refactoring
 
 Improve structure without changing behavior. Two modes:
-- In-pipeline (automatic): clean the code you just wrote, while tests are green — the
-  Refactor step of TDD. Scope = your own change only.
-- Standalone (opt-in): pre-existing or unrelated code, only on an explicit request —
-  never unprompted; clarify goal/scope/risk if unclear.
+- In-pipeline (automatic): the Refactor step of TDD — clean the code you just wrote while
+  tests are green. Scope = your own change only.
+- Standalone: pre-existing or unrelated code, on explicit request only — never unprompted;
+  clarify goal/scope/risk if unclear.
 
 - [ ] Behavior preserved: same tests pass before and after.
-- [ ] Scope contained: only the target; no feature/fix/unrelated code smuggled in.
-- [ ] Duplication removed; logic simplified; nesting reduced; early returns.
-- [ ] Names clear and consistent; stale comments fixed; survivors explain *why*.
-- [ ] No dead code or stray files; small reversible steps.
-- [ ] Any performance change is measured and its behavior risk justified.
+- [ ] Scope contained: no feature/fix/unrelated code smuggled in.
+- [ ] Result meets `quality.md` gates; names clear; stale comments fixed (survivors
+      explain *why*).
+- [ ] Small reversible steps; any performance change measured and justified.

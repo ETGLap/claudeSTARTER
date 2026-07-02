@@ -1,11 +1,11 @@
 # TDD
 
-Drive every change from a failing test. Red → Green → Refactor. Lens, then gate.
+Drive every change from a failing test: Red → Green → Refactor.
 
 - [ ] Expected behavior defined.
-- [ ] Existing tests located and reused; missing tests identified.
+- [ ] Relevant existing tests run first — green baseline established.
+- [ ] Existing tests reused where possible; missing tests identified.
 - [ ] Smallest failing test written before production code (Red).
 - [ ] Minimal code makes it pass (Green); edge cases covered.
-- [ ] Tests actually run; output read; no regressions.
-- [ ] No claim of passing without a run.
+- [ ] Tests run and output read; no regressions vs the baseline.
 - [ ] If tests are impossible: manual verification documented.

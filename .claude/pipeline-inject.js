@@ -15,9 +15,9 @@ try {
   );
   if (cfg.injectPipeline !== false) {
     process.stdout.write(
-      "Conductor pipeline (automatic, no command needed): for any build/change run " +
-        "reuse-check → test-first (Red) → code (Green) → refactor your own change → " +
-        "quality + security → tests green → final. Tests must pass before done. See CLAUDE.md."
+      "Conductor pipeline: for any build/change run reuse-check → failing test (Red) → " +
+        "code (Green) → refactor your own change → quality + security → tests green → " +
+        "final report. Tests must pass before done. See CLAUDE.md."
     );
   }
 } catch {

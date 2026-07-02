@@ -1,11 +1,11 @@
 # Quality
 
-Smallest, cleanest change that fits the codebase. Lens, then gate.
+Smallest, cleanest change that fits the codebase.
 
-- [ ] Smallest change; nothing unrelated touched; existing behavior preserved.
+- [ ] Nothing unrelated touched; existing behavior preserved.
 - [ ] Follows existing patterns and naming.
 - [ ] No duplication; minimal nesting; early returns.
-- [ ] No new file or dependency without reason.
-- [ ] No dead code or stray files.
-- [ ] No obviously needless work; optimize only when measured (see refactoring).
+- [ ] Errors handled at boundaries; failures surface clearly — no silent catch.
+- [ ] No new file or dep without reason; no dead code or stray files.
+- [ ] No needless work; optimize only when measured.
 - [ ] Readable and maintainable.
