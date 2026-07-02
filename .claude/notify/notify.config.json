@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "sound": true,
+  "events": {
+    "stop": true,
+    "notification": true
+  },
+  "includeProjectName": true,
+  "messages": {
+    "stop": "✅ Task complete",
+    "notification": null
+  }
+}
