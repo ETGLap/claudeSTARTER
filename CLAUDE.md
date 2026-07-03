@@ -11,6 +11,12 @@ Not an app generator — never create feature/backend/frontend/api/db/ui generat
   never guess.
 - TDD is the center: a failing test before production code (Red → Green → Refactor). If a
   test is impossible, document manual verification.
+- Spec before building: any new feature, endpoint, UI flow, schema/infra change, command, or
+  behavior-changing refactor gets a short spec first (`.claude/templates/spec.md` →
+  `docs-vault/specs/`) — outcomes, scope, and verification criteria before code. Bug fixes,
+  spikes, reverse-engineering, docs-only, and behavior-preserving refactors skip it; when
+  unsure, write a one-paragraph mini-spec. Global constraints live here and in
+  `project-context.md`, never repeated in each spec. Specs describe behavior, not implementation.
 - Scale ceremony to risk: no-behavior changes (docs, comments, config text) skip Red-Green
   but still get verification and the report.
 - Reuse first: search for existing code and patterns to reuse or extend; a duplicate is
@@ -26,10 +32,12 @@ Not an app generator — never create feature/backend/frontend/api/db/ui generat
 Reviewers are lenses while you work, gates before you move on.
 
 1. Context — this file · `.claude/context/project-context.md` · nearest local `CLAUDE.md`.
-2. Plan — analyze the requirement and expected behavior · run relevant existing tests
-   (green baseline) · discover & reuse/extend (`reviewers/architecture.md`) · if the change
-   site needs restructuring first, propose a prep refactor · plan tests (`reviewers/tdd.md`) ·
-   judge effort (`policy/model-policy.md`) · write the failing test (Red).
+2. Plan — if spec-worthy, write or locate the spec (`/spec`, `reviewers/spec.md`); its
+   verification criteria seed the tests · analyze the requirement and expected behavior ·
+   run relevant existing tests (green baseline) · discover & reuse/extend
+   (`reviewers/architecture.md`) · if the change site needs restructuring first, propose a
+   prep refactor · plan tests (`reviewers/tdd.md`) · judge effort (`policy/model-policy.md`) ·
+   write the failing test (Red).
 3. Code — smallest change that passes (Green).
 4. Review — refactor your own change while green (`reviewers/refactoring.md`) · quality
    (`reviewers/quality.md`) · security (`reviewers/security.md`) · placement
@@ -43,6 +51,8 @@ explicit request — behavior-preserving and test-gated (`reviewers/refactoring.
 
 ## Commands
 
+- `/spec` — draft/verify a spec (six elements) before building; specs live in
+  `docs-vault/specs/`. Describe behavior and outcomes, not implementation.
 - `/docs` — audit docs vs code, update `docs-vault/` from `.claude/templates/docs/`
   (propose first; never overwrite human prose; ADRs append-only).
 - `/maintain` — trim the `.claude/` system + refresh `project-context.md`.

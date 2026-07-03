@@ -13,8 +13,9 @@ Node hooks that shape *how* Claude works in your codebase.
 **One automatic pipeline**, defined in `CLAUDE.md` and re-surfaced every turn by a hook:
 
 1. **Context** — project context + nearest local `CLAUDE.md`
-2. **Plan** — analyze the requirement · run existing tests (green baseline) · reuse-first
-   discovery · plan tests · write the failing test (Red)
+2. **Plan** — spec first if the change is feature-sized (`/spec`) · analyze the requirement ·
+   run existing tests (green baseline) · reuse-first discovery · plan tests · write the
+   failing test (Red)
 3. **Code** — smallest change that passes (Green)
 4. **Review** — refactor the change just made · quality · security · placement · re-run tests
 5. **Finish** — final gate · propose `/docs` if behavior changed · flag stale context
@@ -66,10 +67,10 @@ CLAUDE.md                     Rules + the canonical 6-step pipeline (always in c
 ├── policy/
 │   ├── model-policy.md       Recommend the cheapest model that fits the task
 │   └── delegation.md         Exploration → read-only subagents; implementation → main session
-├── commands/                 /docs · /maintain · /modernize
+├── commands/                 /spec · /docs · /maintain · /modernize
 ├── context/
 │   └── project-context.md    Stable project facts (stack, commands, risks)
-├── templates/docs/           Skeletons for the docs-vault (architecture, api, db, ADR, …)
+├── templates/                spec.md + docs/ skeletons for the docs-vault (architecture, api, db, ADR, …)
 ├── notify/                   Cross-platform desktop notifier (opt-in)
 ├── pipeline-inject.js        UserPromptSubmit hook — keeps the pipeline in context
 ├── test-gate.js              Stop hook — blocks "done" while tests are red (opt-in)
@@ -81,6 +82,7 @@ CLAUDE.md                     Rules + the canonical 6-step pipeline (always in c
 
 | Command | What it does |
 | --- | --- |
+| `/spec` | Draft or verify a spec (outcomes · scope · constraints · prior decisions · tasks · verification) before building a feature-sized change. Specs live in `docs-vault/specs/`; verification criteria seed the TDD tests. |
 | `/docs` | Audit docs against code, then update `docs-vault/` (Obsidian-style, wiki-linked) from the templates. Proposes before writing; ADRs are append-only. |
 | `/maintain` | Trim the `.claude/` system, refresh `project-context.md`, verify the model policy is current. |
 | `/modernize` | One-time retrofit of an existing codebase to Conductor standards. |
