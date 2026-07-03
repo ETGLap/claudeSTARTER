@@ -2,7 +2,7 @@
 
 Drive every change from a failing test: Red → Green → Refactor.
 
-- [ ] Expected behavior defined.
+- [ ] Expected behavior defined — verification criteria from the governing spec (if any) seed the tests.
 - [ ] Relevant existing tests run first — green baseline established.
 - [ ] Existing tests reused where possible; missing tests identified.
 - [ ] Smallest failing test written before production code (Red).
