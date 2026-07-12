@@ -11,12 +11,14 @@ Not an app generator — never create feature/backend/frontend/api/db/ui generat
   never guess.
 - TDD is the center: a failing test before production code (Red → Green → Refactor). If a
   test is impossible, document manual verification.
-- Spec before building: any new feature, endpoint, UI flow, schema/infra change, command, or
-  behavior-changing refactor gets a short spec first (`.claude/templates/spec.md` →
-  `docs-vault/specs/`) — outcomes, scope, and verification criteria before code. Bug fixes,
-  spikes, reverse-engineering, docs-only, and behavior-preserving refactors skip it; when
-  unsure, write a one-paragraph mini-spec. Global constraints live here and in
-  `project-context.md`, never repeated in each spec. Specs describe behavior, not implementation.
+- Spec before building: features, endpoints, UI flows, schema/infra changes, commands, and
+  behavior-changing refactors get a six-element spec first (`/sdd` → `docs-vault/specs/`).
+  Bug fixes, spikes, reverse-engineering, docs-only, and behavior-preserving refactors skip
+  it; when unsure, a one-paragraph mini-spec. Specs describe behavior, not implementation;
+  global constraints live here and in `project-context.md`, never repeated per spec.
+- Stack-specific knowledge is opt-in: copy a pack from `.claude/templates/stacks/` to
+  `.claude/skills/<stack>/SKILL.md`. Packs inform the pipeline; nothing ever scaffolds
+  code outside spec→test→implement.
 - Scale ceremony to risk: no-behavior changes (docs, comments, config text) skip Red-Green
   but still get verification and the report.
 - Reuse first: search for existing code and patterns to reuse or extend; a duplicate is
@@ -32,8 +34,9 @@ Not an app generator — never create feature/backend/frontend/api/db/ui generat
 Reviewers are lenses while you work, gates before you move on.
 
 1. Context — this file · `.claude/context/project-context.md` · nearest local `CLAUDE.md`.
-2. Plan — if spec-worthy, write or locate the spec (`/spec`, `reviewers/spec.md`); its
-   verification criteria seed the tests · analyze the requirement and expected behavior ·
+2. Plan — if spec-worthy, write or locate the spec (`/sdd`, `reviewers/spec.md`; build
+   approved specs via `/implement`); its verification criteria seed the tests · analyze
+   the requirement and expected behavior ·
    run relevant existing tests (green baseline) · discover & reuse/extend
    (`reviewers/architecture.md`) · if the change site needs restructuring first, propose a
    prep refactor · plan tests (`reviewers/tdd.md`) · judge effort (`policy/model-policy.md`) ·
@@ -41,7 +44,9 @@ Reviewers are lenses while you work, gates before you move on.
 3. Code — smallest change that passes (Green).
 4. Review — refactor your own change while green (`reviewers/refactoring.md`) · quality
    (`reviewers/quality.md`) · security (`reviewers/security.md`) · placement
-   (`reviewers/architecture.md`) · re-run tests.
+   (`reviewers/architecture.md`) · conditional lenses, only in scope: performance (hot
+   paths) · accessibility (UI) · compatibility (multi-platform) · documentation
+   (behavior/interfaces changed) · re-run tests.
 5. Finish — final gate (`reviewers/final.md`) · propose `/docs` if behavior or interfaces
    changed · flag stale `project-context.md` if stack/commands/architecture/deps changed.
 6. Report — changed · tested · not verified · risks. Short and honest.
@@ -51,13 +56,22 @@ explicit request — behavior-preserving and test-gated (`reviewers/refactoring.
 
 ## Commands
 
-- `/spec` — draft/verify a spec (six elements) before building; specs live in
-  `docs-vault/specs/`. Describe behavior and outcomes, not implementation.
+- `/sdd <idea>` — idea → discovery → interview → six-element spec in `docs-vault/specs/`;
+  the source of truth for `/implement`.
+- `/implement [spec]` — build an approved spec through the TDD pipeline; no separate
+  /tdd — verification criteria become the failing tests.
 - `/docs` — audit docs vs code, update `docs-vault/` from `.claude/templates/docs/`
   (propose first; never overwrite human prose; ADRs append-only).
-- `/maintain` — trim the `.claude/` system + refresh `project-context.md`.
+- `/maintain` — trim the `.claude/` system + refresh `project-context.md` ·
+  `project` scope: gated structural/reusability refactor audit.
 - `/modernize` — one-time retrofit of an existing project to Conductor standards
   (audit → plan → apply on approval).
+
+## Agents (`.claude/agents/`)
+
+Read-only specialists for discovery and audits (spec-analyst, architecture-scout,
+security/performance/accessibility/docs auditors). They return concise briefs and never
+implement — delegation rules in `policy/delegation.md`.
 
 ## Hooks (`.claude/settings.json`)
 

@@ -7,7 +7,8 @@ existing reviewers and commands, never duplicates them.
 1. Map — inventory stack, structure, entry points, tests, docs, existing Claude context.
    Large repo → fan out read-only `Explore` subagents.
 2. Audit (read-only) — apply each reviewer across the codebase: architecture + reuse/
-   duplication, quality + refactoring debt, test gaps, security. Prioritize findings.
+   duplication, quality + refactoring debt, test gaps, security. Fan out the
+   `.claude/agents/` auditors for independent areas. Prioritize findings.
 3. Plan — present a sequenced modernization plan + deferred backlog; wait for approval.
 4. Establish context — init `.claude/context/project-context.md`; generate docs via `/docs`
    (incl. the "Shared building blocks" reuse map); set `testCommand` in

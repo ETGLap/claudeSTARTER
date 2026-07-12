@@ -8,6 +8,10 @@ reusable code, mapping dependencies, reviewing docs/tests/config, researching li
 or APIs. Independent questions → parallel subagents, one per aspect; combine their
 summaries before deciding.
 
+Named specialists live in `.claude/agents/` (spec-analyst, architecture-scout, security/
+performance/accessibility/docs auditors) — prefer the matching specialist over generic
+`Explore`; all are read-only and return the same brief format.
+
 Subagents return a concise brief — findings · file paths/symbols · risks ·
 recommendation — never the exploration log.
 
