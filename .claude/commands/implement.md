@@ -11,8 +11,8 @@ Build an approved spec through the full pipeline. TDD is embedded — there is n
 1. Select — with `$ARGUMENTS`: resolve the spec by number or slug in `docs-vault/specs/`.
    Without: list specs with `Status: approved`, ask which. Refuse `draft` (offer to run the
    `reviewers/spec.md` gate first); warn before re-running an `implemented` one.
-2. Context — `CLAUDE.md` · `context/project-context.md` · the spec · its linked prior
-   decisions and ADRs.
+2. Context — the CLAUDE.md files (kit `.claude/CLAUDE.md` + project root) ·
+   `context/project-context.md` · the spec · its linked prior decisions and ADRs.
 3. Baseline — run existing tests green before touching code (`reviewers/tdd.md`).
 4. Red — delegate test-landscape discovery to `agents/test-auditor` (reusable fixtures,
    patterns, placement), then derive failing tests from the spec's §6 verification

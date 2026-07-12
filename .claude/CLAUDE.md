@@ -3,6 +3,10 @@
 Quality system around Claude the builder: verify code before, during, and after changes.
 Not an app generator — never create feature/backend/frontend/api/db/ui generators.
 
+This file is the portable kit manual; it lives in `.claude/` and travels with the kit.
+Project-specific knowledge lives in the root `CLAUDE.md`, generated per project from
+`templates/claude-root.md` — its first line imports this manual.
+
 ## Rules
 
 - Plan before editing. Smallest safe change; no unrelated edits or refactors; new files
@@ -15,7 +19,8 @@ Not an app generator — never create feature/backend/frontend/api/db/ui generat
   behavior-changing refactors get a six-element spec first (`/sdd` → `docs-vault/specs/`).
   Bug fixes, spikes, reverse-engineering, docs-only, and behavior-preserving refactors skip
   it; when unsure, a one-paragraph mini-spec. Specs describe behavior, not implementation;
-  global constraints live here and in `project-context.md`, never repeated per spec.
+  global constraints live in the root `CLAUDE.md` and `project-context.md`, never
+  repeated per spec.
 - Stack-specific knowledge is opt-in: copy a pack from `.claude/templates/stacks/` to
   `.claude/skills/<stack>/SKILL.md`. Packs inform the pipeline; nothing ever scaffolds
   code outside spec→test→implement.
@@ -33,7 +38,8 @@ Not an app generator — never create feature/backend/frontend/api/db/ui generat
 
 Reviewers are lenses while you work, gates before you move on.
 
-1. Context — this file · `.claude/context/project-context.md` · nearest local `CLAUDE.md`.
+1. Context — this file · root `CLAUDE.md` (project-specific) ·
+   `.claude/context/project-context.md` · nearest local `CLAUDE.md`.
 2. Plan — if spec-worthy, write or locate the spec (`/sdd`, `reviewers/spec.md`; build
    approved specs via `/implement`); its verification criteria seed the tests · analyze
    the requirement and expected behavior ·
@@ -79,11 +85,14 @@ never implement — delegation rules in `policy/delegation.md`.
   `.claude/pipeline.config.json` (`testCommand` + `enabled:true`).
 - `Stop`/`Notification` → `notify.js` — desktop notify, opt-in (see `.claude/notify/README.md`).
 
-## Local CLAUDE.md
+## Project CLAUDE.md files
 
-Create one only where a folder has unique rules: architecture, framework, local commands,
-security, naming, or domain logic. Content: purpose · conventions · commands · risks.
-Don't repeat root rules.
+- Root `CLAUDE.md` — owned by the project, not the kit: philosophy, conventions, domain
+  rules. Generated from `templates/claude-root.md` on the first `/maintain project` run;
+  keeps `@.claude/CLAUDE.md` as its first line so this manual always loads.
+- Folder-local `CLAUDE.md` — only where a folder has unique rules: architecture,
+  framework, local commands, security, naming, or domain logic. Content: purpose ·
+  conventions · commands · risks. Don't repeat root or kit rules.
 
 ## Scaling
 

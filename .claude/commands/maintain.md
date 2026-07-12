@@ -5,8 +5,9 @@ them in one run.
 
 ## `/maintain` — tend the `.claude/` system
 
-- Trim CLAUDE.md, reviewers, policy, agents, templates: remove duplication, keep files
-  low-token.
+- Trim `.claude/CLAUDE.md`, reviewers, policy, agents, templates: remove duplication,
+  keep files low-token. The root `CLAUDE.md` is project-owned — propose trims, never
+  rewrite it silently.
 - Refresh `.claude/context/project-context.md` (stack, commands, architecture, risks);
   remove outdated facts.
 - Verify `policy/model-policy.md` against the current model lineup.
@@ -19,8 +20,10 @@ Conductor retrofit — as if the project were built with the Starter from day on
 
 1. Detect — first run? (`context/project-context.md` unfilled or no `docs-vault/`.)
    If so, bootstrap: map stack, structure, entry points, tests, docs (large repo → fan
-   out read-only agents) · init `project-context.md` · generate docs via `/docs` (incl.
-   the "Shared building blocks" reuse map) · set `testCommand` in
+   out read-only agents) · init `project-context.md` · generate the root `CLAUDE.md`
+   from `templates/claude-root.md` (imports the kit manual + project-context; never
+   overwrite an existing root CLAUDE.md without asking) · generate docs via `/docs`
+   (incl. the "Shared building blocks" reuse map) · set `testCommand` in
    `.claude/pipeline.config.json`.
 2. Audit (read-only) — fan out `agents/architecture-scout` plus relevant auditors:
    folder structure, reuse/duplication, UI/theme consistency, database layer,

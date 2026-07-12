@@ -10,7 +10,8 @@ and three tiny zero-dependency Node hooks that shape *how* Claude works in your 
 
 ## How it works
 
-**One automatic pipeline**, defined in `CLAUDE.md` and re-surfaced every turn by a hook:
+**One automatic pipeline**, defined in `.claude/CLAUDE.md` (the portable kit manual) and
+re-surfaced every turn by a hook:
 
 1. **Context** — project context + nearest local `CLAUDE.md`
 2. **Plan** — spec first if the change is feature-sized (`/sdd`, built via `/implement`) ·
@@ -45,7 +46,10 @@ writing the tests themselves — stay in the main session so Red→Green stays c
 
 ### New project
 
-1. Copy `.claude/` and `CLAUDE.md` into your repo root.
+1. Copy the `.claude/` folder into your repo root — that's the whole kit. Its
+   `CLAUDE.md` manual loads automatically; your project's own root `CLAUDE.md`
+   (philosophy, conventions, domain rules) is generated later by `/maintain project`
+   and imports the kit via `@.claude/CLAUDE.md`.
 2. *(Optional)* Enable the test gate — edit `.claude/pipeline.config.json`:
 
    ```json
@@ -66,8 +70,10 @@ periodically to keep the architecture and structure healthy as the project grows
 ## Layout
 
 ```text
-CLAUDE.md                     Rules + the canonical 6-step pipeline (always in context)
+CLAUDE.md                     Project-owned: philosophy · conventions · domain rules
+                              (generated from templates/claude-root.md; imports the kit)
 .claude/
+├── CLAUDE.md                 Kit manual: rules + the canonical 6-step pipeline
 ├── reviewers/                One concern per file: principle + checklist gates
 │   ├── architecture.md       Reuse before create; placement and consistency
 │   ├── tdd.md                Red → Green → Refactor; green baseline first
@@ -86,7 +92,7 @@ CLAUDE.md                     Rules + the canonical 6-step pipeline (always in c
 ├── commands/                 /sdd · /implement · /docs · /maintain
 ├── context/
 │   └── project-context.md    Stable project facts (stack, commands, risks)
-├── templates/                spec.md + docs/ skeletons + stacks/ opt-in stack packs
+├── templates/                spec.md + claude-root.md + docs/ skeletons + stacks/ packs
 ├── notify/                   Cross-platform desktop notifier (opt-in)
 ├── pipeline-inject.js        UserPromptSubmit hook — keeps the pipeline in context
 ├── test-gate.js              Stop hook — blocks "done" while tests are red (opt-in)
@@ -133,7 +139,7 @@ config or missing binary can never break your session.
 ## Extending
 
 - **New reviewer** — one file in `.claude/reviewers/` (a principle line + `- [ ]` gates),
-  wired into the right pipeline step in `CLAUDE.md`.
+  wired into the right pipeline step in `.claude/CLAUDE.md`.
 - **New hook** — clone the `notify.js` contract: zero-dep, never throw, always exit 0.
 - **New agent** — one file in `.claude/agents/` (frontmatter with `tools: Read, Glob, Grep`
   — read-only, always), body: mission + reviewer lens + brief contract.

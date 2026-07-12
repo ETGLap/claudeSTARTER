@@ -18,7 +18,7 @@ try {
       "Conductor pipeline: spec first if feature-sized (/sdd, build via /implement) → " +
         "reuse-check → failing test (Red) → code (Green) → refactor your own change → " +
         "quality + security → tests green → final report. Tests must pass before done. " +
-        "See CLAUDE.md."
+        "See .claude/CLAUDE.md."
     );
   }
 } catch {
