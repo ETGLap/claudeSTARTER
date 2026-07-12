@@ -14,8 +14,9 @@ Build an approved spec through the full pipeline. TDD is embedded — there is n
 2. Context — `CLAUDE.md` · `context/project-context.md` · the spec · its linked prior
    decisions and ADRs.
 3. Baseline — run existing tests green before touching code (`reviewers/tdd.md`).
-4. Red — derive failing tests from the spec's §6 verification criteria: automated ones
-   become tests; manual/acceptance ones are noted for the report.
+4. Red — delegate test-landscape discovery to `agents/test-auditor` (reusable fixtures,
+   patterns, placement), then derive failing tests from the spec's §6 verification
+   criteria: automated ones become tests; manual/acceptance ones are noted for the report.
 5. Green — smallest change that passes; reuse before create (`reviewers/architecture.md`).
 6. Refactor — your own change only, tests stay green (`reviewers/refactoring.md`).
 7. Review — always: quality · security · architecture. By classification: performance

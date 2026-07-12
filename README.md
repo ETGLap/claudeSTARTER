@@ -29,9 +29,10 @@ scope-gated lenses (performance, accessibility, compatibility, documentation) th
 only when a change is in their scope.
 
 **Agents** (`.claude/agents/`) are read-only specialists Claude delegates discovery and
-audits to — spec-analyst, architecture-scout, and security/performance/accessibility/docs
-auditors. Each returns a concise brief (findings · paths · risks · recommendation) and
-never implements; code changes stay in the main session.
+audits to — spec-analyst (SDD discovery), architecture-scout, and
+security/performance/accessibility/docs/test auditors. Each returns a concise brief
+(findings · paths · risks · recommendation) and never implements; code changes — including
+writing the tests themselves — stay in the main session so Red→Green stays coupled.
 
 **Enforcement is split by what can be trusted:**
 

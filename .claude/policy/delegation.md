@@ -9,8 +9,9 @@ or APIs. Independent questions → parallel subagents, one per aspect; combine t
 summaries before deciding.
 
 Named specialists live in `.claude/agents/` (spec-analyst, architecture-scout, security/
-performance/accessibility/docs auditors) — prefer the matching specialist over generic
-`Explore`; all are read-only and return the same brief format.
+performance/accessibility/docs/test auditors) — prefer the matching specialist over
+generic `Explore`; all are read-only and return the same brief format. Writing tests is
+implementation: the test-auditor maps the landscape, the main session writes the tests.
 
 Subagents return a concise brief — findings · file paths/symbols · risks ·
 recommendation — never the exploration log.

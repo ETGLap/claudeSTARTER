@@ -69,8 +69,8 @@ explicit request — behavior-preserving and test-gated (`reviewers/refactoring.
 ## Agents (`.claude/agents/`)
 
 Read-only specialists for discovery and audits (spec-analyst, architecture-scout,
-security/performance/accessibility/docs auditors). They return concise briefs and never
-implement — delegation rules in `policy/delegation.md`.
+security/performance/accessibility/docs/test auditors). They return concise briefs and
+never implement — delegation rules in `policy/delegation.md`.
 
 ## Hooks (`.claude/settings.json`)
 
