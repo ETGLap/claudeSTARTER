@@ -57,9 +57,10 @@ never implements; code changes stay in the main session.
 
 ### Existing project
 
-Do the steps above, then run `/modernize` once: a deliberate, gated retrofit —
-map → repo-wide read-only audit → prioritized plan → establish context and docs →
-apply on approval in small, behavior-preserving, test-gated steps.
+Do the steps above, then run `/maintain project`: its first run is a deliberate, gated
+retrofit — map → establish context and docs → repo-wide read-only audit → prioritized
+plan → apply on approval in small, behavior-preserving, test-gated steps. Re-run it
+periodically to keep the architecture and structure healthy as the project grows.
 
 ## Layout
 
@@ -81,7 +82,7 @@ CLAUDE.md                     Rules + the canonical 6-step pipeline (always in c
 ├── policy/
 │   ├── model-policy.md       Recommend the cheapest model that fits the task
 │   └── delegation.md         Exploration → read-only subagents; implementation → main session
-├── commands/                 /sdd · /implement · /docs · /maintain · /modernize
+├── commands/                 /sdd · /implement · /docs · /maintain
 ├── context/
 │   └── project-context.md    Stable project facts (stack, commands, risks)
 ├── templates/                spec.md + docs/ skeletons + stacks/ opt-in stack packs
@@ -99,8 +100,7 @@ CLAUDE.md                     Rules + the canonical 6-step pipeline (always in c
 | `/sdd <idea>` | Idea → read-only discovery → interactive interview → six-element spec (outcomes · scope · constraints · prior decisions · tasks · verification) in `docs-vault/specs/`. Supersedes the old `/spec`. |
 | `/implement [spec]` | Build an approved spec through the TDD pipeline — verification criteria become the failing tests. No arg: pick from the approved-spec list. |
 | `/docs` | Audit docs against code, then update `docs-vault/` (Obsidian-style, wiki-linked) from the templates. Proposes before writing; ADRs are append-only. |
-| `/maintain` | Trim the `.claude/` system, refresh `project-context.md`, verify the model policy is current. `/maintain project`: gated audit of project structure, reusable components, and scalability. |
-| `/modernize` | One-time retrofit of an existing codebase to Conductor standards. |
+| `/maintain` | Trim the `.claude/` system, refresh `project-context.md`, verify the model policy is current. `/maintain project`: recurring gated audit of architecture, structure, reusable components, and scalability — its first run retrofits an existing codebase to Conductor standards (absorbs the old `/modernize`). |
 
 Everything else — reuse checks, TDD, refactoring the change just made, security review,
 docs proposals — happens automatically inside the pipeline.

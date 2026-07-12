@@ -63,9 +63,8 @@ explicit request — behavior-preserving and test-gated (`reviewers/refactoring.
 - `/docs` — audit docs vs code, update `docs-vault/` from `.claude/templates/docs/`
   (propose first; never overwrite human prose; ADRs append-only).
 - `/maintain` — trim the `.claude/` system + refresh `project-context.md` ·
-  `project` scope: gated structural/reusability refactor audit.
-- `/modernize` — one-time retrofit of an existing project to Conductor standards
-  (audit → plan → apply on approval).
+  `project` scope: recurring architecture/structure audit → plan → gated refactors;
+  first run on an existing codebase bootstraps context and docs (the retrofit).
 
 ## Agents (`.claude/agents/`)
 
