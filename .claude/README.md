@@ -1,0 +1,159 @@
+# Conductor
+
+A quality system for [Claude Code](https://claude.com/claude-code). Drop it into any
+repository and every build or change Claude makes runs through a TDD-centered pipeline
+with reuse, quality, security, and architecture gates — automatically, no command needed.
+
+This file is the kit's manual for humans and travels with the `.claude/` folder; the
+host project's root `README.md` stays its own.
+
+Conductor is **not an app generator**. It adds zero runtime dependencies to your project:
+it is a set of markdown instructions, four slash commands, read-only specialist agents,
+and three tiny zero-dependency Node hooks that shape *how* Claude works in your codebase.
+
+## How it works
+
+**One automatic pipeline**, defined in `.claude/CLAUDE.md` (the portable kit manual) and
+re-surfaced every turn by a hook:
+
+1. **Context** — project context + nearest local `CLAUDE.md`
+2. **Plan** — spec first if the change is feature-sized (`/sdd`, built via `/implement`) ·
+   analyze the requirement · run existing tests (green baseline) · reuse-first discovery ·
+   plan tests · write the failing test (Red)
+3. **Code** — smallest change that passes (Green)
+4. **Review** — refactor the change just made · quality · security · placement ·
+   conditional lenses (performance · accessibility · compatibility · documentation) ·
+   re-run tests
+5. **Finish** — final gate · propose `/docs` if behavior changed · flag stale context
+6. **Report** — changed · tested · not verified · risks
+
+**Reviewers** (`.claude/reviewers/`) are lenses while Claude works and gates before it moves
+on: architecture (reuse before create), TDD, quality, security, refactoring, final — plus
+scope-gated lenses (performance, accessibility, compatibility, documentation) that apply
+only when a change is in their scope.
+
+**Agents** (`.claude/agents/`) are read-only specialists Claude delegates discovery and
+audits to — spec-analyst (SDD discovery), architecture-scout, and
+security/performance/accessibility/docs/test auditors. Each returns a concise brief
+(findings · paths · risks · recommendation) and never implements; code changes — including
+writing the tests themselves — stay in the main session so Red→Green stays coupled.
+
+**Enforcement is split by what can be trusted:**
+
+- *Semantic* judgments (is this minimal? secure? a duplicate?) stay **advisory** — markdown
+  reviewers the model applies.
+- *Deterministic* checks become **real hooks** — the test gate reads your test command's
+  exit code on the Stop event and blocks "done" while it's red.
+
+## Quick start
+
+### New project
+
+1. Copy the `.claude/` folder into your repo root — that's the whole kit. Its
+   `CLAUDE.md` manual loads automatically; your project's own root `CLAUDE.md`
+   (philosophy, conventions, domain rules) is generated later by `/maintain project`
+   and imports the kit via `@.claude/CLAUDE.md`.
+2. *(Optional)* Enable the test gate — edit `.claude/pipeline.config.json`:
+
+   ```json
+   { "enabled": true, "testCommand": "npm test" }
+   ```
+
+3. *(Optional)* Desktop notifications when Claude finishes or needs input — see
+   [`.claude/notify/README.md`](notify/README.md).
+4. Start Claude Code. The pipeline is automatic.
+
+### Existing project
+
+Do the steps above, then run `/maintain project`: its first run is a deliberate, gated
+retrofit — map → establish context and docs → repo-wide read-only audit → prioritized
+plan → apply on approval in small, behavior-preserving, test-gated steps. Re-run it
+periodically to keep the architecture and structure healthy as the project grows.
+
+## Layout
+
+```text
+CLAUDE.md                     Project-owned: philosophy · conventions · domain rules
+                              (generated from templates/claude-root.md; imports the kit)
+.claude/
+├── CLAUDE.md                 Kit manual: rules + the canonical 6-step pipeline
+├── README.md                 This file — the kit's manual for humans
+├── reviewers/                One concern per file: principle + checklist gates
+│   ├── architecture.md       Reuse before create; placement and consistency
+│   ├── tdd.md                Red → Green → Refactor; green baseline first
+│   ├── quality.md            Smallest, cleanest change; error handling
+│   ├── security.md           Proportional to risk
+│   ├── refactoring.md        Own-change automatic; pre-existing code on request only
+│   ├── performance.md        Scope-gated: hot paths, queries, data volume
+│   ├── accessibility.md      Scope-gated: UI-facing changes
+│   ├── compatibility.md      Scope-gated: multi-platform projects
+│   ├── documentation.md      Scope-gated: behavior/interface changes
+│   └── final.md              Last gate before the response
+├── agents/                   Read-only specialists: discovery + audits, never implement
+├── policy/
+│   ├── model-policy.md       Recommend the cheapest model that fits the task
+│   └── delegation.md         Exploration → read-only subagents; implementation → main session
+├── commands/                 /sdd · /implement · /docs · /maintain
+├── context/
+│   └── project-context.md    Stable project facts (stack, commands, risks)
+├── templates/                spec.md + claude-root.md + docs/ skeletons + stacks/ packs
+├── notify/                   Cross-platform desktop notifier (opt-in)
+├── pipeline-inject.js        UserPromptSubmit hook — keeps the pipeline in context
+├── test-gate.js              Stop hook — blocks "done" while tests are red (opt-in)
+├── pipeline.config.json      Test-gate + inject configuration
+└── settings.json             Hook wiring
+```
+
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `/sdd <idea>` | Idea → read-only discovery → interactive interview → six-element spec (outcomes · scope · constraints · prior decisions · tasks · verification) in `docs-vault/specs/`. Supersedes the old `/spec`. |
+| `/implement [spec]` | Build an approved spec through the TDD pipeline — verification criteria become the failing tests. No arg: pick from the approved-spec list. |
+| `/docs` | Audit docs against code, then update `docs-vault/` (Obsidian-style, wiki-linked) from the templates. Proposes before writing; ADRs are append-only. |
+| `/maintain` | Trim the `.claude/` system, refresh `project-context.md`, verify the model policy is current. `/maintain project`: recurring gated audit of architecture, structure, reusable components, and scalability — its first run retrofits an existing codebase to Conductor standards (absorbs the old `/modernize`). |
+
+Everything else — reuse checks, TDD, refactoring the change just made, security review,
+docs proposals — happens automatically inside the pipeline.
+
+## Stack packs
+
+Optional stack-specific *knowledge* (never generators) lives in `.claude/templates/stacks/`.
+Enable one by copying it into skills, e.g.:
+
+```sh
+mkdir -p .claude/skills/htmx && cp .claude/templates/stacks/htmx.md .claude/skills/htmx/SKILL.md
+```
+
+Disable by deleting the skill directory. Packs inform specs, reviews, and implementation;
+nothing scaffolds code outside spec→test→implement. `htmx` ships as the example.
+
+## Configuration (`.claude/pipeline.config.json`)
+
+| Key | Default | Meaning |
+| --- | --- | --- |
+| `enabled` | `false` | Master switch for the test gate. |
+| `testCommand` | `""` | Shell command the gate runs (e.g. `npm test`). Empty = no-op. |
+| `maxBlocks` | `2` | Consecutive red blocks before the gate yields to the user. |
+| `injectPipeline` | `true` | Inject the one-line pipeline reminder every turn. |
+
+Hooks are deliberately fail-safe: zero dependencies, never throw, always exit 0 — a broken
+config or missing binary can never break your session.
+
+## Extending
+
+- **New reviewer** — one file in `.claude/reviewers/` (a principle line + `- [ ]` gates),
+  wired into the right pipeline step in `.claude/CLAUDE.md`.
+- **New hook** — clone the `notify.js` contract: zero-dep, never throw, always exit 0.
+- **New agent** — one file in `.claude/agents/` (frontmatter with `tools: Read, Glob, Grep`
+  — read-only, always), body: mission + reviewer lens + brief contract.
+- **New stack pack** — one SKILL.md-formatted file in `.claude/templates/stacks/`;
+  knowledge only, never scaffolding.
+- **Scaling rule** — add to `.claude/` only on repeated need: reusable, prevents future
+  mistakes, worth the tokens. The instruction set is deliberately small; run `/maintain`
+  periodically to keep it that way.
+
+## Requirements
+
+The Claude Code CLI. Hooks run on the Node runtime that ships with it — nothing is
+installed into your project.
