@@ -61,11 +61,12 @@ Reviewers are lenses while you work, gates before you move on.
 
 1. Context — this file (with the gates imported below) · root `CLAUDE.md`
    (project-specific) · `.claude/context/project-context.md` · nearest local `CLAUDE.md`.
-2. Plan — if spec-worthy, write or locate the spec (`/sdd`; build approved specs via
-   `/implement`); its verification criteria seed the tests · analyze the requirement and
-   expected behavior · run relevant existing tests (green baseline) · discover &
-   reuse/extend · if the change site needs restructuring first, propose a prep refactor ·
-   plan tests · write the failing test (Red).
+2. Plan — if spec-worthy, write or locate the spec (`/sdd`); its verification criteria seed
+   the tests. A spec written this session is committed and built after `/clear`, so
+   `/implement` tests whether it stands alone · analyze the requirement and expected
+   behavior · run relevant existing tests (green baseline) · discover & reuse/extend · if
+   the change site needs restructuring first, propose a prep refactor · plan tests · write
+   the failing test and commit it before any implementation (Red).
 3. Code — smallest change that passes (Green).
 4. Review — refactor your own change while green · quality · security · placement ·
    conditional lenses, only in scope: `review-performance` (hot paths) ·
@@ -101,7 +102,10 @@ never implement. They inherit this file, so the gates below apply to them too.
 ## Hooks (`.claude/hooks/`, wired in `settings.json`)
 
 - `context-inject.js` (UserPromptSubmit) — injects live session state: branch, test-gate
-  status, approved specs awaiting `/implement`.
+  status, approved specs awaiting `/implement`, and a warning when a spec was authored in
+  this session.
+- `spec-session.js` (PostToolUse) — records which session authored each spec, so the
+  fresh-session test is enforceable rather than advisory.
 - `guard-writes.js` (PreToolUse) — ADRs stay append-only · implemented specs are
   superseded, not rewritten · secret files are never written.
 - `guard-bash.js` (PreToolUse) — force pushes, commits on the default branch, and

@@ -150,6 +150,71 @@ test("every hook survives a malformed payload and still exits 0", () => {
   }
 });
 
+test("spec-session + context-inject: the fresh-session test is actually enforced", (t) => {
+  const { LEDGER_PATH } = require("./lib/spec-state.js");
+  const saved = fs.existsSync(LEDGER_PATH) ? fs.readFileSync(LEDGER_PATH, "utf8") : null;
+  t.after(() => {
+    if (saved === null) fs.rmSync(LEDGER_PATH, { force: true });
+    else fs.writeFileSync(LEDGER_PATH, saved);
+  });
+
+  const dir = fixtureRepo();
+
+  // Session S1 writes an approved spec...
+  const recorded = runHook("spec-session.js", {
+    session_id: "S1",
+    cwd: dir,
+    tool_input: { file_path: path.join(dir, "docs-vault", "specs", "0003-open.md") },
+  });
+  assert.strictEqual(recorded.code, 0);
+  assert.strictEqual(recorded.json, null, "the recorder must stay silent");
+
+  // ...so S1 is warned off implementing it here...
+  const sameSession = runHook("context-inject.js", { session_id: "S1", cwd: dir });
+  const warned = sameSession.json.hookSpecificOutput.additionalContext;
+  assert.match(warned, /Spec 0003-open was written in this session\./);
+  assert.match(warned, /Commit it and \/clear before \/implement/);
+
+  // ...while a fresh session sees it as an ordinary pending spec.
+  const freshSession = runHook("context-inject.js", { session_id: "S2", cwd: dir });
+  const clean = freshSession.json.hookSpecificOutput.additionalContext;
+  assert.match(clean, /Approved specs awaiting \/implement: 0003-open\./);
+  assert.doesNotMatch(clean, /was written in this session/);
+
+  cleanup(dir);
+});
+
+test("spec-session: ignores writes that are not specs", (t) => {
+  const { LEDGER_PATH } = require("./lib/spec-state.js");
+  const before = fs.existsSync(LEDGER_PATH) ? fs.readFileSync(LEDGER_PATH, "utf8") : null;
+  t.after(() => {
+    if (before === null) fs.rmSync(LEDGER_PATH, { force: true });
+  });
+
+  runHook("spec-session.js", {
+    session_id: "S1",
+    tool_input: { file_path: "src/app.js" },
+  });
+  const after = fs.existsSync(LEDGER_PATH) ? fs.readFileSync(LEDGER_PATH, "utf8") : null;
+  assert.strictEqual(after, before, "a non-spec write must not touch the ledger");
+});
+
+test("context-inject: the bootstrap nag keys on the root CLAUDE.md, not the blank template", () => {
+  const dir = fixtureRepo();
+
+  const bare = runHook("context-inject.js", { cwd: dir });
+  assert.match(bare.json.hookSpecificOutput.additionalContext, /maintain project/);
+
+  fs.writeFileSync(path.join(dir, "CLAUDE.md"), "@.claude/CLAUDE.md\n");
+  const bootstrapped = runHook("context-inject.js", { cwd: dir });
+  assert.doesNotMatch(
+    bootstrapped.json.hookSpecificOutput.additionalContext,
+    /maintain project/
+  );
+
+  cleanup(dir);
+});
+
 test("notify stays silent while disabled in config", () => {
   const { code, json } = runHook("notify.js", { cwd: process.cwd() }, ["stop"]);
   assert.strictEqual(code, 0);

@@ -12,7 +12,8 @@ wired in [`../settings.json`](../settings.json).
 
 | Hook | Event · matcher | What it guarantees |
 | --- | --- | --- |
-| `context-inject.js` | `UserPromptSubmit` | Injects live session state each turn: branch (flagged when it's the default), whether the test gate is armed, specs awaiting `/implement`, and whether `project-context.md` is still blank. Deliberately *not* a paraphrase of `CLAUDE.md` — that is already in context. |
+| `context-inject.js` | `UserPromptSubmit` | Injects live session state each turn: branch (flagged when it's the default), whether the test gate is armed, specs awaiting `/implement`, whether a spec was written in *this* session, and whether the project is un-bootstrapped. Deliberately *not* a paraphrase of `CLAUDE.md` — that is already in context. |
+| `spec-session.js` | `PostToolUse` · `Write\|Edit\|MultiEdit` | Records which session authored each spec, so the fresh-session test is enforceable. Writes only to `.claude/.state/spec-sessions.json`; emits nothing. |
 | `guard-writes.js` | `PreToolUse` · `Write\|Edit\|MultiEdit\|NotebookEdit` | ADRs stay append-only · specs marked `Status: implemented` are superseded rather than rewritten · secret files (`.env*`, `*.pem`, `*.key`, `id_rsa*`) are never written. |
 | `guard-bash.js` | `PreToolUse` · `Bash` | Force pushes, commits on `main`/`master`, and recursive force deletes ask before running. |
 | `format.js` | `PostToolUse` · `Write\|Edit\|MultiEdit` | Runs the project formatter on the file just written. Tells Claude only when the file actually changed. No-op until `format.command` is set. |
@@ -21,6 +22,25 @@ wired in [`../settings.json`](../settings.json).
 
 Guards use `permissionDecision: "ask"` rather than `"deny"`, so you stay the authority and
 see which rule fired — only secret material is denied outright.
+
+## The fresh-session test
+
+Writing a spec and implementing it in the same session carries invisible context: the
+exploration, the alternatives you rejected, the assumptions you never wrote down. The
+implementation may work for reasons the spec never captured — which means the spec would
+fail for anyone else, and you would not find out.
+
+`spec-session.js` records the authoring session id against each spec slug. When
+`context-inject.js` sees that an approved spec's author matches the current session, it
+says so before you build:
+
+> ⚠ Spec 0004-checkout was written in this session. Commit it and /clear before /implement
+> — implementing here reuses the context that wrote it, so a spec with gaps would still
+> appear to work.
+
+The ledger lives in `.claude/.state/spec-sessions.json` (gitignored, capped at 50 entries,
+first author wins so a later typo fix cannot launder authorship). Turning off
+`injectContext` disables both the recording and the warning.
 
 ## Configuration
 

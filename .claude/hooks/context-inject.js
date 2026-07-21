@@ -12,6 +12,7 @@ const { run, additionalContext } = require("./lib/io.js");
 const { loadConfig } = require("./lib/config.js");
 const { currentBranch } = require("./lib/git.js");
 const { buildContext } = require("./lib/context.js");
+const { authorOf, loadLedger } = require("./lib/spec-state.js");
 
 const SPECS_DIR = "docs-vault/specs";
 const MAX_SPECS_SCANNED = 40;
@@ -34,9 +35,14 @@ function approvedSpecs(cwd) {
   }
 }
 
-/** True while project-context.md still holds its unfilled placeholders. */
-function contextUnfilled() {
+/**
+ * True when this project has never been bootstrapped. Keyed on the root CLAUDE.md as well
+ * as the placeholders, because `project-context.md` ships blank *on purpose* — it is the
+ * host-project template. Only the absence of both means nobody has run `/maintain project`.
+ */
+function needsBootstrap(cwd) {
   try {
+    if (fs.existsSync(path.join(cwd, "CLAUDE.md"))) return false;
     return /<what this project is>/.test(fs.readFileSync(PROJECT_CONTEXT, "utf8"));
   } catch {
     return false;
@@ -56,12 +62,16 @@ run((payload) => {
   if (config.injectContext === false) return null;
 
   const cwd = payload.cwd || process.cwd();
+  const pending = approvedSpecs(cwd);
+  const ledger = loadLedger();
+
   const text = buildContext({
     branch: currentBranch(cwd),
     defaultBranch: defaultBranch(cwd),
     testGate: config.testGate,
-    approvedSpecs: approvedSpecs(cwd),
-    contextUnfilled: contextUnfilled(),
+    approvedSpecs: pending,
+    sameSessionSpecs: pending.filter((slug) => authorOf(ledger, slug) === payload.session_id),
+    needsBootstrap: needsBootstrap(cwd),
   });
 
   return additionalContext("UserPromptSubmit", text);

@@ -8,7 +8,7 @@ This file is the kit's manual for humans and travels with the `.claude/` folder;
 host project's root `README.md` stays its own.
 
 Conductor is **not an app generator**. It adds zero runtime dependencies to your project:
-markdown instructions, four workflow skills, read-only specialist agents, and six tiny
+markdown instructions, four workflow skills, read-only specialist agents, and seven tiny
 zero-dependency Node hooks that shape *how* Claude works in your codebase.
 
 ## The spectrum map
@@ -38,9 +38,9 @@ This is also why enforcement is split by what can be trusted:
 **One automatic pipeline**, defined in `.claude/CLAUDE.md`:
 
 1. **Context** — kit manual + always-loaded gates · project context · nearest local `CLAUDE.md`
-2. **Plan** — spec first if the change is feature-sized (`/sdd`, built via `/implement`) ·
-   analyze the requirement · run existing tests (green baseline) · reuse-first discovery ·
-   plan tests · write the failing test (Red)
+2. **Plan** — spec first if the change is feature-sized (`/sdd`, then `/clear` and build via
+   `/implement` in a fresh session) · analyze the requirement · run existing tests (green
+   baseline) · reuse-first discovery · plan tests · write and commit the failing test (Red)
 3. **Code** — smallest change that passes (Green)
 4. **Review** — refactor the change just made · quality · security · placement ·
    scope-gated lenses (performance · accessibility · compatibility · documentation) ·
@@ -102,11 +102,13 @@ CLAUDE.md                     Project-owned: philosophy · conventions · domain
 ├── conductor.config.json     One config for every hook
 ├── settings.json             Hook wiring + permissions.deny for secret files
 ├── hooks/                    Deterministic layer (see hooks/README.md)
-│   ├── lib/                  Pure decision logic — guards · config · context · git · io
+│   ├── lib/                  Pure decision logic — guards · config · context · git ·
+│   │                         spec-state · io
 │   ├── context-inject.js     UserPromptSubmit — live session state
 │   ├── guard-writes.js       PreToolUse — ADRs, implemented specs, secret files
 │   ├── guard-bash.js         PreToolUse — force push, commit on main, rm -rf
 │   ├── format.js             PostToolUse — run the project formatter
+│   ├── spec-session.js       PostToolUse — records who authored each spec
 │   ├── test-gate.js          Stop — blocks "done" while tests are red
 │   ├── notify.js             Stop/Notification — desktop notifier (opt-in)
 │   └── *.test.js             node --test, zero dependencies

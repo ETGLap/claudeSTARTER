@@ -37,3 +37,6 @@ npm-debug.log
 .env
 .env.local
 config.env
+
+# Conductor session state (spec-authorship ledger — machine-local, never shared)
+.claude/.state/
