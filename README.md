@@ -5,6 +5,12 @@ A portable quality system for [Claude Code](https://claude.com/claude-code): cop
 through a spec- and TDD-centered pipeline with reuse, quality, security, and
 architecture gates.
 
+It ships as one instruction manual with always-loaded gates, four workflow skills, four
+scope-gated review lenses, seven read-only specialist agents, and six zero-dependency Node
+hooks — each rule placed in the Claude Code primitive that can actually hold it: advisory
+guidance in `CLAUDE.md`, non-negotiables in hooks, occasional instructions in skills,
+exploration in subagents.
+
 - **Full documentation:** [`.claude/README.md`](.claude/README.md) — it travels with
   the kit, so target projects keep it too.
 - **The kit manual Claude follows:** [`.claude/CLAUDE.md`](.claude/CLAUDE.md).

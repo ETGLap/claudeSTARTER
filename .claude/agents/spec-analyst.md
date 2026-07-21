@@ -7,7 +7,8 @@ model: sonnet
 
 Investigate how the codebase currently handles the area a new idea touches: existing
 behavior, user flows, related specs/ADRs in `docs-vault/`, and constraints that should
-shape the spec. Apply `reviewers/spec.md` as the lens — do not restate it.
+shape the spec. The Spec gate is already in your context via the kit manual — apply it as
+the lens, do not restate it.
 
 Return a concise brief: findings · file paths/symbols · risks · recommendation.
 Never implement; never return the exploration log.

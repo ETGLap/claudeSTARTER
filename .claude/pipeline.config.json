@@ -1,6 +1,0 @@
-{
-  "enabled": false,
-  "testCommand": "",
-  "maxBlocks": 2,
-  "injectPipeline": true
-}

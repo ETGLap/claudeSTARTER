@@ -7,7 +7,8 @@ model: sonnet
 
 Map the test landscape for the given area: existing tests and their patterns, reusable
 fixtures/helpers, coverage gaps against the spec's verification criteria, and where a new
-test should live. Apply `reviewers/tdd.md` as the lens — do not restate it.
+test should live. The TDD gate is already in your context via the kit manual — apply it as
+the lens, do not restate it.
 
 Return a concise brief: findings · file paths/symbols · risks · recommendation.
 Never implement; never return the exploration log.

@@ -1,3 +1,9 @@
+---
+name: review-compatibility
+description: Compatibility gates for projects targeting more than one platform (web, mobile, desktop, or multiple runtimes) — keeping business logic shared and platform-agnostic, isolating platform-specific code behind interfaces, and recording feature-parity divergences.
+when_to_use: The project ships to multiple platforms or runtimes and the change touches shared logic, a platform-specific implementation, or responsive/adaptive behavior.
+---
+
 # Compatibility
 
 Shared by default; platform-specific only when required.

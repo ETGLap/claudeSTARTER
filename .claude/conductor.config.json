@@ -1,0 +1,31 @@
+{
+  "testGate": {
+    "enabled": true,
+    "command": "node --test .claude/hooks/*.test.js",
+    "maxBlocks": 2
+  },
+  "format": {
+    "enabled": true,
+    "command": ""
+  },
+  "guards": {
+    "adrAppendOnly": true,
+    "implementedSpecs": true,
+    "secretFiles": true,
+    "gitSafety": true
+  },
+  "notify": {
+    "enabled": false,
+    "sound": true,
+    "events": {
+      "stop": true,
+      "notification": true
+    },
+    "includeProjectName": true,
+    "messages": {
+      "stop": "✅ Task complete",
+      "notification": null
+    }
+  },
+  "injectContext": true
+}
