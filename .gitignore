@@ -40,3 +40,5 @@ config.env
 
 # Conductor session state (spec-authorship ledger — machine-local, never shared)
 .claude/.state/
+# Working notes for the starter audit (not part of the kit)
+.tmp/
