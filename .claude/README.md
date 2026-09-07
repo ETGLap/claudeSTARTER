@@ -50,8 +50,10 @@ This is also why enforcement is split by what can be trusted:
 
 **Gates** (`.claude/reviewers/` + `.claude/policy/delegation.md`) are `@`-imported by the kit
 manual, so they are genuinely in context every session rather than a path the model might
-read: architecture (reuse before create), TDD, quality, security, refactoring, spec, final.
-Because subagents load `CLAUDE.md`, they inherit these too.
+read: requirements, architecture (reuse before create), TDD, quality, security, refactoring,
+spec, final. The kit's own agents load `CLAUDE.md`, so they inherit these too — but the
+built-in `Explore` and `Plan` agents deliberately skip it, which is why
+[`policy/delegation.md`](policy/delegation.md) routes gated work to the named specialists.
 
 **Scope-gated lenses** are skills instead, because they only sometimes apply.
 `review-accessibility` declares `paths:` globs so the harness activates it only on UI
