@@ -15,6 +15,9 @@ Every instruction in this kit lives in exactly one primitive, chosen by what it 
 
 - **Advisory → this file.** Judgment, conventions, the pipeline. Followed most of the
   time, which is right for "prefer the smallest change" and wrong for "always format".
+- **Scoped to a file pattern → a rule** (`rules/`). Conventions true only for a layer —
+  components, routes, migrations, tests. `paths:` frontmatter loads them when Claude
+  touches a matching file and costs nothing otherwise.
 - **Guaranteed → a hook** (`hooks/`). Anything that must happen every time: the test gate,
   the write and shell guards, the formatter. Executes on every matching event, no judgment.
 - **On-demand → a skill** (`skills/`). Scoped instructions that cost nothing until they
@@ -120,6 +123,22 @@ never implement. They inherit this file, so the gates below apply to them too.
 - `notify.js` (Stop/Notification) — desktop notification, opt-in.
 
 All are configured in `.claude/conductor.config.json`.
+
+## Where knowledge lives (the category test)
+
+Four layers, disjoint by construction. Ask of any sentence: **would it be identical in every
+project that installs this kit?**
+
+- **Yes** → `.claude/CLAUDE.md` or a reviewer. Always loaded.
+- **No, but true everywhere in *this* project** → the root `CLAUDE.md`. Always loaded.
+- **No, true only for files matching a pattern** → `.claude/rules/<name>.md` with `paths:`.
+  Loads in scope only.
+- **No, and no glob can express it** → a folder-local `CLAUDE.md`. Loads when Claude reads
+  that directory.
+
+Each sentence has exactly one home; writing it in two is a category error. Rules ship with
+the kit, so they work in a project whose directories do not exist yet — which a folder-local
+`CLAUDE.md` cannot do.
 
 ## Project CLAUDE.md files
 

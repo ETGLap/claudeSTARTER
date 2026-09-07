@@ -19,6 +19,7 @@ every instruction in exactly one, chosen by what the instruction needs:
 | Need | Primitive | Where | Why |
 | --- | --- | --- | --- |
 | Judgment, conventions, context | `CLAUDE.md` | `.claude/CLAUDE.md` + imported gates | Always in context; followed most of the time. Right for "prefer the smallest change", wrong for "always format". |
+| Conventions for one layer or file type | **Rule** | `.claude/rules/` | `paths:` frontmatter loads it only when Claude touches a matching file. Ships with the kit, so it works before the directory exists. |
 | Must happen every time | **Hook** | `.claude/hooks/` | Executes on every matching event regardless of what the model decides. |
 | Scoped, occasional instructions | **Skill** | `.claude/skills/` | Description is cheap and always visible; the body costs nothing until relevant. |
 | Isolated exploration | **Subagent** | `.claude/agents/` | Own context window, own tool limits; returns a brief instead of flooding the session. |
@@ -122,6 +123,12 @@ CLAUDE.md                     Project-owned: philosophy · conventions · domain
 │   ├── refactoring.md        Own-change automatic; pre-existing code on request only
 │   ├── spec.md               Six elements; behavior not implementation
 │   └── final.md              Last gate before the response
+├── rules/                    Path-scoped conventions — load only in scope
+│   ├── frontend.md           components · props in, events out · states
+│   ├── backend.md            thin handlers · validate at the boundary · authz
+│   ├── database.md           append-only migrations · constraints in the DB
+│   ├── mobile.md             shared by default · native a11y · manual device checks
+│   └── tests.md              one behavior per test · expected values from the spec
 ├── skills/                   On-demand layer
 │   ├── sdd · implement · docs · maintain        The four workflows
 │   └── review-performance · review-accessibility · review-compatibility ·
