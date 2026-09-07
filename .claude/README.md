@@ -136,6 +136,7 @@ CLAUDE.md                     Project-owned: philosophy · conventions · domain
 
 | Skill | What it does |
 | --- | --- |
+| `/start <what to build>` | Project genesis for an empty repo: classify → triage explicit/inferred/optional requirements → decide the stack (written as ADR 0001) → scaffold the toolchain → wire `testGate.command` → generate root `CLAUDE.md` + context → hand off to `/sdd`. The only time the kit scaffolds. |
 | `/sdd <idea>` | Idea → read-only discovery → interactive interview → six-element spec (outcomes · scope · constraints · prior decisions · tasks · verification) in `docs-vault/specs/`. |
 | `/implement [spec]` | Build an approved spec through the TDD pipeline — verification criteria become the failing tests. No arg: pick from the approved-spec list. |
 | `/docs` | Audit docs against code, then update `docs-vault/` (Obsidian-style, wiki-linked) from the templates. Proposes before writing; ADRs are append-only. |

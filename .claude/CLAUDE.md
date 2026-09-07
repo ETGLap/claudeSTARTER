@@ -83,6 +83,9 @@ explicit request — behavior-preserving and test-gated.
 
 ## Skills (`.claude/skills/`)
 
+- `/start <what to build>` — project genesis: classify → triage requirements → decide the
+  stack (ADR) → scaffold the toolchain → wire the test gate → hand off to `/sdd`. The one
+  time the kit scaffolds; empty/new projects only.
 - `/sdd <idea>` — idea → discovery → interview → six-element spec in `docs-vault/specs/`;
   the source of truth for `/implement`.
 - `/implement [spec]` — build an approved spec through the TDD pipeline; no separate

@@ -35,15 +35,39 @@ function approvedSpecs(cwd) {
   }
 }
 
+// A project with any of these has a codebase to map; without them there is nothing yet.
+const CODEBASE_MARKERS = [
+  "package.json",
+  "pyproject.toml",
+  "requirements.txt",
+  "go.mod",
+  "Cargo.toml",
+  "pom.xml",
+  "build.gradle",
+  "Gemfile",
+  "composer.json",
+  "src",
+  "app",
+  "lib",
+];
+
+const hasCodebase = (cwd) =>
+  CODEBASE_MARKERS.some((marker) => fs.existsSync(path.join(cwd, marker)));
+
 /**
- * True when this project has never been bootstrapped. Keyed on the root CLAUDE.md as well
- * as the placeholders, because `project-context.md` ships blank *on purpose* — it is the
- * host-project template. Only the absence of both means nobody has run `/maintain project`.
+ * Which bootstrap path this project needs, or false when it is already set up. Keyed on the
+ * root CLAUDE.md as well as the placeholders, because `project-context.md` ships blank *on
+ * purpose* — it is the host-project template. Only the absence of both means nobody has set
+ * the project up yet.
+ *
+ * Genesis and retrofit are then split by whether any code exists: `/maintain project` maps a
+ * codebase and has nothing to do before one exists, so an empty repo goes to `/start`.
  */
 function needsBootstrap(cwd) {
   try {
     if (fs.existsSync(path.join(cwd, "CLAUDE.md"))) return false;
-    return /<what this project is>/.test(fs.readFileSync(PROJECT_CONTEXT, "utf8"));
+    if (!/<what this project is>/.test(fs.readFileSync(PROJECT_CONTEXT, "utf8"))) return false;
+    return hasCodebase(cwd) ? "retrofit" : "genesis";
   } catch {
     return false;
   }

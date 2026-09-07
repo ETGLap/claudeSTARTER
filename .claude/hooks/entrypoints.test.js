@@ -199,18 +199,32 @@ test("spec-session: ignores writes that are not specs", (t) => {
   assert.strictEqual(after, before, "a non-spec write must not touch the ledger");
 });
 
+// Which nag fires (genesis vs retrofit) is asserted precisely in context.test.js. This test
+// owns the trigger condition only: a nag appears while the root CLAUDE.md is missing, and
+// stops once it exists — the blank project-context.md alone must never suppress it.
+const BOOTSTRAP_NAG = /maintain project|\/start/;
+
 test("context-inject: the bootstrap nag keys on the root CLAUDE.md, not the blank template", () => {
   const dir = fixtureRepo();
 
   const bare = runHook("context-inject.js", { cwd: dir });
-  assert.match(bare.json.hookSpecificOutput.additionalContext, /maintain project/);
+  assert.match(bare.json.hookSpecificOutput.additionalContext, BOOTSTRAP_NAG);
 
   fs.writeFileSync(path.join(dir, "CLAUDE.md"), "@.claude/CLAUDE.md\n");
   const bootstrapped = runHook("context-inject.js", { cwd: dir });
-  assert.doesNotMatch(
-    bootstrapped.json.hookSpecificOutput.additionalContext,
-    /maintain project/
-  );
+  assert.doesNotMatch(bootstrapped.json.hookSpecificOutput.additionalContext, BOOTSTRAP_NAG);
+
+  cleanup(dir);
+});
+
+test("context-inject: a repo with source files gets the retrofit nag, not genesis", () => {
+  const dir = fixtureRepo();
+  fs.writeFileSync(path.join(dir, "package.json"), "{}\n");
+
+  const nag = runHook("context-inject.js", { cwd: dir }).json.hookSpecificOutput
+    .additionalContext;
+  assert.match(nag, /maintain project/);
+  assert.doesNotMatch(nag, /\/start/);
 
   cleanup(dir);
 });

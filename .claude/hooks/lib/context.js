@@ -53,7 +53,15 @@ function buildContext(state = {}) {
     );
   }
 
-  if (needsBootstrap) {
+  // Genesis and retrofit need opposite advice: `/maintain project` maps an existing
+  // codebase, and there is nothing to map before one exists. A bare `true` reads as
+  // retrofit — the safe default, since it never tells someone with real code to scaffold.
+  if (needsBootstrap === "genesis") {
+    lines.push(
+      "This project has no application code yet — run `/start <what to build>` to " +
+        "classify it, decide a stack, and wire the test gate."
+    );
+  } else if (needsBootstrap) {
     lines.push(
       "This project is not bootstrapped (blank project-context.md, no root CLAUDE.md) — " +
         "run `/maintain project`."

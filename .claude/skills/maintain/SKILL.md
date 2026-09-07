@@ -26,6 +26,9 @@ them in one run.
 Recurring structural upkeep. The first run on an existing codebase doubles as the
 Conductor retrofit — as if the project were built with the Starter from day one.
 
+This is the **retrofit** path, for a codebase that already exists. An empty or nearly-empty
+project has nothing to map: send it to `/start` instead.
+
 1. Detect — first run? (`.claude/context/project-context.md` unfilled or no `docs-vault/`.)
    If so, bootstrap: map stack, structure, entry points, tests, docs (large repo → fan
    out read-only agents) · init `project-context.md` · generate the root `CLAUDE.md`

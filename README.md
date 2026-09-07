@@ -40,17 +40,18 @@ Its first run is a deliberate, gated retrofit. It maps your stack and structure,
 the `docs-vault/` documentation, sets your test and format commands, then runs a read-only
 audit and proposes a prioritized plan. Nothing is changed without your approval.
 
-**New/empty project** — there is nothing to map yet, so just set your commands in
-[`.claude/conductor.config.json`](.claude/conductor.config.json):
+**New/empty project** — start Claude Code and describe what you want:
 
-```json
-{
-  "testGate": { "enabled": true, "command": "npm test" },
-  "format":   { "enabled": true, "command": "npx prettier --write" }
-}
+```text
+/start a dashboard for tracking elevator inspections
 ```
 
-Run `/maintain project` later, once the codebase has a shape worth mapping.
+Genesis runs once: it classifies the project, separates what you asked for from what the
+application professionally requires, recommends a stack and records the choice as an ADR,
+scaffolds the toolchain, and wires your test command. It stops when
+`testGate.command` exits 0 — then hands off to `/sdd` and never scaffolds again.
+
+It creates a skeleton, not features. The first feature goes through the loop in Step 3.
 
 > Until this step is done, Claude tells you every turn that the project is not bootstrapped.
 

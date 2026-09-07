@@ -13,6 +13,8 @@ workflow references. Specs describe behavior, not implementation.
 1. Analyze — restate the idea (`$ARGUMENTS`); decide spec-worthiness. Bug fix, spike,
    reverse-engineering, docs-only, or behavior-preserving refactor → say so and skip;
    when unsure, offer a one-paragraph mini-spec (Outcomes + Verification only).
+   If the project has no application code or toolchain yet, this is genesis, not a spec —
+   stop and recommend `/start`, which ends by handing back here.
 2. Discover (read-only) — delegate to the `spec-analyst` and `architecture-scout` agents:
    existing behavior, reusable code, prior decisions, constraints. Independent questions →
    parallel agents.
