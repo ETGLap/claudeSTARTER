@@ -11,7 +11,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { run, additionalContext } = require("./lib/io.js");
 const { loadConfig } = require("./lib/config.js");
-const { currentBranch } = require("./lib/git.js");
+const { currentBranch, resolveGitDir } = require("./lib/git.js");
 const { buildContext, selectApproved } = require("./lib/context.js");
 const { authorOf, loadLedger } = require("./lib/spec-state.js");
 
@@ -35,10 +35,21 @@ function approvedSpecs(cwd) {
   }
 }
 
-/** The repo's default branch, best-effort from the origin HEAD ref. */
+/**
+ * The repo's default branch, best-effort from the local head refs. Goes through
+ * resolveGitDir so a worktree — where `.git` is a pointer file, not a directory — reports
+ * the real default instead of silently falling back.
+ */
 function defaultBranch(cwd) {
-  for (const candidate of ["main", "master"]) {
-    if (fs.existsSync(path.join(cwd, ".git", "refs", "heads", candidate))) return candidate;
+  try {
+    const gitDir = resolveGitDir(cwd);
+    if (gitDir) {
+      for (const candidate of ["main", "master"]) {
+        if (fs.existsSync(path.join(gitDir, "refs", "heads", candidate))) return candidate;
+      }
+    }
+  } catch {
+    /* fall through to the default */
   }
   return "main";
 }

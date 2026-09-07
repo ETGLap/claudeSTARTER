@@ -112,12 +112,10 @@ test("decideWrite: every rule is individually disableable", () => {
   );
 });
 
+// --force-with-lease deliberately omitted: it carries its own protection (it refuses when
+// the remote moved since your last fetch), so it is exempted below rather than prompted on.
 test("decideBash: force-push asks first", () => {
-  for (const command of [
-    "git push --force",
-    "git push -f origin main",
-    "git push --force-with-lease",
-  ]) {
+  for (const command of ["git push --force", "git push -f origin main"]) {
     const hit = decideBash({ command, branch: "feature", config: ON });
     assert.ok(hit, command);
     assert.strictEqual(hit.permissionDecision, "ask");

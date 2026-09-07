@@ -101,7 +101,7 @@ function hasFlag(flags, short, longs) {
 
 function decideBash({ command, branch = null, config = {} } = {}) {
   if (typeof command !== "string" || command === "") return null;
-  if (!on(config, "gitSafety")) return null;
+  if (!on(config, "gitSafety")) return null; // legacy master switch for all three rules
 
   for (const segment of segments(command)) {
     const parts = tokens(segment);
@@ -110,6 +110,7 @@ function decideBash({ command, branch = null, config = {} } = {}) {
     const flags = rest.filter((token) => token.startsWith("-"));
 
     if (verb === "rm") {
+      if (!on(config, "recursiveDelete")) continue;
       const recursive = hasFlag(flags, "r", ["recursive"]) || hasFlag(flags, "R", []);
       const forced = hasFlag(flags, "f", ["force"]);
       if (recursive && forced) {
@@ -123,16 +124,25 @@ function decideBash({ command, branch = null, config = {} } = {}) {
 
     if (verb !== "git") continue;
 
+    // --force-with-lease refuses when the remote moved since your last fetch, which is the
+    // protection this prompt exists to provide. Asking on it too trains you through both.
+    const lease = rest.includes("--force-with-lease") || rest.some((t) => t.startsWith("--force-with-lease="));
     if (
+      on(config, "forcePush") &&
       rest.includes("push") &&
-      (hasFlag(flags, "f", ["force", "force-with-lease"]) || rest.includes("--force"))
+      !lease &&
+      (hasFlag(flags, "f", ["force"]) || rest.includes("--force"))
     ) {
       return ask(
         `Force push: \`${segment}\`. This rewrites remote history — confirm explicitly.`
       );
     }
 
-    if (rest.includes("commit") && (branch === "main" || branch === "master")) {
+    if (
+      on(config, "defaultBranchCommit") &&
+      rest.includes("commit") &&
+      (branch === "main" || branch === "master")
+    ) {
       return ask(
         `Committing directly to \`${branch}\`. Project rule: never commit to the ` +
           `default branch — branch first, then commit.`

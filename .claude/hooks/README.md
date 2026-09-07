@@ -12,12 +12,13 @@ wired in [`../settings.json`](../settings.json).
 
 | Hook | Event · matcher | What it guarantees |
 | --- | --- | --- |
-| `context-inject.js` | `UserPromptSubmit` | Injects live session state each turn: branch (flagged when it's the default), whether the test gate is armed, specs awaiting `/implement`, whether a spec was written in *this* session, and whether the project is un-bootstrapped. Deliberately *not* a paraphrase of `CLAUDE.md` — that is already in context. |
+| `session-start.js` | `SessionStart` | Says once per session whether the project needs `/start` (no code yet) or `/maintain project` (a codebase to retrofit), and whether a test command is configured. These cannot change mid-session, so they are not repeated per turn. |
+| `context-inject.js` | `UserPromptSubmit` | Injects only what can change between turns: branch (flagged when it's the default), specs awaiting `/implement`, and whether a spec was written in *this* session. Deliberately *not* a paraphrase of `CLAUDE.md` — that is already in context. |
 | `spec-session.js` | `PostToolUse` · `Write\|Edit\|MultiEdit` | Records which session authored each spec, so the fresh-session test is enforceable. Writes only to `.claude/.state/spec-sessions.json`; emits nothing. |
 | `guard-writes.js` | `PreToolUse` · `Write\|Edit\|MultiEdit\|NotebookEdit` | ADRs stay append-only · specs marked `Status: implemented` are superseded rather than rewritten · secret files (`.env*`, `*.pem`, `*.key`, `id_rsa*`) are never written. |
-| `guard-bash.js` | `PreToolUse` · `Bash` | Force pushes, commits on `main`/`master`, and recursive force deletes ask before running. |
+| `guard-bash.js` | `PreToolUse` · `Bash` | Force pushes, commits on `main`/`master`, and recursive force deletes ask before running. `--force-with-lease` is exempt — it carries its own protection. |
 | `format.js` | `PostToolUse` · `Write\|Edit\|MultiEdit` | Runs the project formatter on the file just written. Tells Claude only when the file actually changed. No-op until `format.command` is set. |
-| `test-gate.js` | `Stop` | Blocks "done" while the test command exits non-zero. The one place the kit refuses to trust judgment — it reads an exit code and makes no semantic call. |
+| `test-gate.js` | `Stop` | Blocks "done" while the test command exits non-zero. The one place the kit refuses to trust judgment — it reads an exit code and makes no semantic call. Skips the run entirely when the working tree is unchanged since a run that passed, since `Stop` fires every turn. |
 | `notify.js` | `Stop`, `Notification` | Desktop notification when Claude finishes or needs you. Opt-in. |
 
 Guards use `permissionDecision: "ask"` rather than `"deny"`, so you stay the authority and
@@ -48,8 +49,8 @@ first author wins so a later typo fix cannot launder authorship). Turning off
 {
   "testGate": { "enabled": true, "command": "npm test", "maxBlocks": 2 },
   "format":   { "enabled": true, "command": "npx prettier --write" },
-  "guards":   { "adrAppendOnly": true, "implementedSpecs": true,
-                "secretFiles": true, "gitSafety": true },
+  "guards":   { "adrAppendOnly": true, "implementedSpecs": true, "secretFiles": true,
+                "recursiveDelete": true, "forcePush": true, "defaultBranchCommit": true },
   "notify":   { "enabled": false, "sound": true,
                 "events": { "stop": true, "notification": true },
                 "includeProjectName": true,
@@ -63,7 +64,7 @@ first author wins so a later typo fix cannot launder authorship). Turning off
 | `testGate.command` | `""` | Shell command the Stop gate runs. Empty = no-op. |
 | `testGate.maxBlocks` | `2` | Consecutive red blocks before the gate yields to you. |
 | `format.command` | `""` | Formatter, invoked as `<command> <file>`. Empty = no-op. |
-| `guards.*` | `true` | Each guard rule is individually disableable. |
+| `guards.*` | `true` | Each rule is individually disableable. The legacy `gitSafety: false` still turns off all three git/shell rules at once. |
 | `notify.enabled` | `false` | Opt-in — notifications are a personal preference, not a gate. |
 | `injectContext` | `true` | Per-turn session-state injection. |
 

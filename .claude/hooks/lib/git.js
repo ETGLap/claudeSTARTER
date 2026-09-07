@@ -42,4 +42,4 @@ function currentBranch(cwd = process.cwd()) {
   }
 }
 
-module.exports = { parseHead, currentBranch };
+module.exports = { parseHead, currentBranch, resolveGitDir };

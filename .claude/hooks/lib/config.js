@@ -20,7 +20,9 @@ const DEFAULTS = Object.freeze({
     adrAppendOnly: true,
     implementedSpecs: true,
     secretFiles: true,
-    gitSafety: true,
+    recursiveDelete: true,
+    forcePush: true,
+    defaultBranchCommit: true,
   },
   notify: {
     enabled: false,

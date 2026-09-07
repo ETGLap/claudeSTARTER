@@ -6,7 +6,9 @@ Smallest, cleanest change that fits the codebase.
 - [ ] Follows existing patterns and naming.
 - [ ] No duplication; minimal nesting; early returns.
 - [ ] Errors handled at boundaries; failures surface clearly — no silent catch.
-- [ ] No new file or dep without reason; no dead code or stray files.
+- [ ] No new file without reason; no dead code or stray files.
+- [ ] A new dependency is justified against writing it: maintained, proportionate in size,
+      licence compatible, and not duplicating something already present.
 - [ ] No needless work; optimize only when measured.
 - [ ] Readable and maintainable.
 

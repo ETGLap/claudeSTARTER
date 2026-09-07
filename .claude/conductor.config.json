@@ -12,7 +12,9 @@
     "adrAppendOnly": true,
     "implementedSpecs": true,
     "secretFiles": true,
-    "gitSafety": true
+    "recursiveDelete": true,
+    "forcePush": true,
+    "defaultBranchCommit": true
   },
   "notify": {
     "enabled": false,
@@ -23,7 +25,7 @@
     },
     "includeProjectName": true,
     "messages": {
-      "stop": "✅ Task complete",
+      "stop": "\u2705 Task complete",
       "notification": null
     }
   },

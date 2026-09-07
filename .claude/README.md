@@ -190,6 +190,50 @@ Pick the primitive by what the addition needs, not by which file is easiest to e
 - **Scaling rule** — add only on repeated need: reusable, prevents future mistakes, worth
   the tokens. The instruction set is deliberately small; run `/maintain` to keep it that way.
 
+## What runs whether you ask or not
+
+Hooks, so they execute every time their condition is met — no reliance on Claude
+remembering:
+
+| When | What happens |
+| --- | --- |
+| Session start | Says once whether the project is bootstrapped and whether a test command is configured |
+| Every turn | Branch, specs awaiting `/implement`, and a warning if a spec was written in this session |
+| Before a file write | ADRs stay append-only · implemented specs must be superseded · secret files (`.env`, `*.pem`, `*.key`, `id_rsa*`) are blocked |
+| Before a shell command | Force pushes, commits on `main`/`master`, and recursive force deletes ask first |
+| After a file write | Your formatter runs on the file |
+| When Claude says "done" | Blocked while your test suite is red — skipped when nothing changed since the last green run |
+
+Guards ask rather than block, so you stay the authority. Tune or disable any of them in
+`.claude/conductor.config.json`.
+
+## Worked example
+
+```text
+you   /sdd users should be able to export the inspection table as CSV
+      … discovery surveys existing export code, Claude interviews you element by element …
+      → docs-vault/specs/0007-csv-export.md   Status: approved
+
+you   git commit -m "docs: spec for CSV export"
+you   /clear
+
+you   /implement 0007-csv-export
+      → baseline green (24 tests)
+      → Red: 3 failing tests from the spec's verification criteria
+             commit "test: CSV export includes all visible columns (red)"
+      → Green: implemented, 27 tests pass
+             commit "feat: CSV export for the inspection table"
+      → reviewed: quality · security · architecture · performance (large result sets)
+      → spec marked implemented
+      → report: changed · tested · not verified · risks
+
+you   /docs
+```
+
+Bug fixes, spikes, refactors and docs-only changes **skip the spec** — say what you want in
+plain language, or use `/debug` when the cause is unknown. The pipeline still applies:
+reuse-check, a failing test first, review, and an honest report. Ceremony scales to risk.
+
 ## Requirements
 
 The Claude Code CLI. Hooks and their tests run on the Node runtime that ships with it —
