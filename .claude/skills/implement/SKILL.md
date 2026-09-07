@@ -32,7 +32,7 @@ Build an approved spec through the full pipeline. TDD is embedded — there is n
 6. Refactor — your own change only, tests stay green.
 7. Review — always: quality · security · architecture. By classification, invoke the
    matching scope-gated skill: `review-performance` (hot paths/data volume) ·
-   `review-accessibility` (UI-facing) · `review-compatibility` (multi-platform) ·
+   `review-accessibility-web` / `-native` (UI-facing) · `review-compatibility` (multi-platform) ·
    `review-documentation` (behavior/interfaces changed).
 8. Finish — final gate · propose `/docs` · mark the spec `Status: implemented` and check
    off its verification criteria · report: changed · tested · not verified · risks.

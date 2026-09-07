@@ -59,8 +59,8 @@ built-in `Explore` and `Plan` agents deliberately skip it, which is why
 [`policy/delegation.md`](policy/delegation.md) routes gated work to the named specialists.
 
 **Scope-gated lenses** are skills instead, because they only sometimes apply.
-`review-accessibility` declares `paths:` globs so the harness activates it only on UI
-files; `review-performance`, `review-compatibility` and `review-documentation` trigger from
+`review-accessibility-web` and `-native` declare `paths:` globs so the harness activates
+the right one for the platform; `review-performance`, `review-compatibility` and `review-documentation` trigger from
 their descriptions.
 
 **Agents** (`.claude/agents/`) are read-only specialists Claude delegates discovery and
@@ -133,8 +133,8 @@ CLAUDE.md                     Project-owned: philosophy · conventions · domain
 │   ├── mobile.md             shared by default · native a11y · manual device checks
 │   └── tests.md              one behavior per test · expected values from the spec
 ├── skills/                   On-demand layer
-│   ├── sdd · implement · docs · maintain        The four workflows
-│   └── review-performance · review-accessibility · review-compatibility ·
+│   ├── start · sdd · implement · docs · maintain   The five workflows
+│   └── review-performance · review-accessibility-web · review-accessibility-native ·
 │       review-documentation                     Scope-gated lenses
 ├── agents/                   Read-only specialists: discovery + audits, never implement
 ├── policy/
