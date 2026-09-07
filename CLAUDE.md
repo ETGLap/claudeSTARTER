@@ -10,8 +10,9 @@
 - **Every rule lives in the primitive that can hold it.** Advisory judgment in `CLAUDE.md`,
   guarantees in hooks, occasional instructions in skills, isolated exploration in
   subagents. A "never" or "always" written as prose is a bug — it belongs in `hooks/`.
-- **The kit is instructions, not machinery.** It never generates application code and never
-  scaffolds outside spec → test → implement.
+- **The kit scaffolds once, at project genesis, and never again.** After `/start` establishes
+  a toolchain and a test runner, every subsequent change goes through spec → test →
+  implement. There are no feature/CRUD/component generators, ever.
 - **Enforcement follows trust.** Semantic judgments (is this minimal? secure? a duplicate?)
   stay advisory. Deterministic checks (exit codes, file paths, session identity) become
   hooks that do not ask the model's opinion.

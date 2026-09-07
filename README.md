@@ -11,8 +11,9 @@ Node hooks — each rule placed in the Claude Code primitive that can actually h
 advisory guidance in `CLAUDE.md`, non-negotiables in hooks, occasional instructions in
 skills, exploration in subagents.
 
-Conductor does **not** generate applications. It shapes *how* Claude works in a codebase
-you own.
+Conductor scaffolds **once**, at project genesis (`/start`), and never again. After that
+establishes a toolchain and a test runner, every subsequent change goes through spec → test
+→ implement. There are no feature/CRUD/component generators, ever.
 
 ---
 

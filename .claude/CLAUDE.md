@@ -1,7 +1,9 @@
 # Conductor
 
 Quality system around Claude the builder: verify code before, during, and after changes.
-Not an app generator — never create feature/backend/frontend/api/db/ui generators.
+The kit scaffolds **once**, at project genesis (`/start`), and never again. After that
+establishes a toolchain and a test runner, every subsequent change goes through spec → test
+→ implement. There are no feature/CRUD/component generators, ever.
 
 This file is the portable kit manual; it lives in `.claude/` and travels with the kit.
 Project-specific knowledge lives in the root `CLAUDE.md`, generated per project from
