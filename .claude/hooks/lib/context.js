@@ -1,35 +1,26 @@
 "use strict";
 
-// Builds the per-turn context line for the UserPromptSubmit hook.
+// Builds the text the context hooks inject, split by how often the fact can change.
 //
 // Deliberately NOT a paraphrase of CLAUDE.md: that file is already in context every turn,
-// so repeating it buys nothing. This reports *session state* CLAUDE.md cannot know —
-// which branch, whether the test gate is armed, which specs are waiting to be built.
+// so repeating it buys nothing and costs tokens on every turn forever. These report *state*
+// CLAUDE.md cannot know.
+//
+// The split matters. Whether the project is bootstrapped, and whether a test command is
+// configured, are fixed for a whole session — they belong in SessionStart. Only the branch,
+// the pending specs, and the same-session warning can change between prompts.
 
-const PIPELINE =
-  "Conductor: spec-worthy work → /sdd → commit → /clear → /implement · reuse-check · " +
-  "failing test written and committed (Red) → code (Green) → refactor your own change · " +
-  "quality + security · tests green before done.";
-
-/** Compose the injected text. Returns null when there is nothing worth saying. */
+/** Compose the per-turn text. Returns null when there is nothing worth saying. */
 function buildContext(state = {}) {
-  const { branch, defaultBranch, testGate, approvedSpecs, needsBootstrap } = state;
+  const { branch, defaultBranch, approvedSpecs } = state;
   const sameSessionSpecs = Array.isArray(state.sameSessionSpecs) ? state.sameSessionSpecs : [];
-  const lines = [PIPELINE];
+  const lines = [];
 
   if (branch) {
     lines.push(
       branch === defaultBranch
         ? `Branch: ${branch} — this is the default branch; branch before committing.`
         : `Branch: ${branch}`
-    );
-  }
-
-  if (testGate?.enabled && testGate.command) {
-    lines.push(`Test gate armed: \`${testGate.command}\` must pass before you finish.`);
-  } else {
-    lines.push(
-      "Test gate not armed (no testCommand configured) — you must run and read tests yourself."
     );
   }
 
@@ -53,6 +44,14 @@ function buildContext(state = {}) {
     );
   }
 
+  return lines.length > 0 ? lines.join("\n") : null;
+}
+
+/** Compose the once-per-session text. Returns null when the project is fully set up. */
+function buildSessionStart(state = {}) {
+  const { needsBootstrap, testGate } = state;
+  const lines = [];
+
   // Genesis and retrofit need opposite advice: `/maintain project` maps an existing
   // codebase, and there is nothing to map before one exists. A bare `true` reads as
   // retrofit — the safe default, since it never tells someone with real code to scaffold.
@@ -68,7 +67,14 @@ function buildContext(state = {}) {
     );
   }
 
-  return lines.join("\n");
+  if (!testGate?.enabled || !testGate.command) {
+    lines.push(
+      "Test gate not armed (no test command configured) — you must run and read tests " +
+        "yourself before claiming anything passes."
+    );
+  }
+
+  return lines.length > 0 ? lines.join("\n") : null;
 }
 
-module.exports = { buildContext, PIPELINE };
+module.exports = { buildContext, buildSessionStart };

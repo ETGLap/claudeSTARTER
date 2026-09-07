@@ -143,6 +143,7 @@ test("every hook survives a malformed payload and still exits 0", () => {
     "guard-writes.js",
     "guard-bash.js",
     "context-inject.js",
+    "session-start.js",
     "format.js",
   ]) {
     const { code } = runHook(hook, "}{ not json");
@@ -199,33 +200,44 @@ test("spec-session: ignores writes that are not specs", (t) => {
   assert.strictEqual(after, before, "a non-spec write must not touch the ledger");
 });
 
-// Which nag fires (genesis vs retrofit) is asserted precisely in context.test.js. This test
-// owns the trigger condition only: a nag appears while the root CLAUDE.md is missing, and
+// Which nag fires (genesis vs retrofit) is asserted precisely in context.test.js. These
+// own the trigger condition only: a nag appears while the root CLAUDE.md is missing, and
 // stops once it exists — the blank project-context.md alone must never suppress it.
 const BOOTSTRAP_NAG = /maintain project|\/start/;
 
-test("context-inject: the bootstrap nag keys on the root CLAUDE.md, not the blank template", () => {
+const sessionText = (dir) => {
+  const { json } = runHook("session-start.js", { cwd: dir });
+  return json ? json.hookSpecificOutput.additionalContext : "";
+};
+
+test("session-start: the bootstrap nag keys on the root CLAUDE.md, not the blank template", () => {
   const dir = fixtureRepo();
 
-  const bare = runHook("context-inject.js", { cwd: dir });
-  assert.match(bare.json.hookSpecificOutput.additionalContext, BOOTSTRAP_NAG);
+  assert.match(sessionText(dir), BOOTSTRAP_NAG);
 
   fs.writeFileSync(path.join(dir, "CLAUDE.md"), "@.claude/CLAUDE.md\n");
-  const bootstrapped = runHook("context-inject.js", { cwd: dir });
-  assert.doesNotMatch(bootstrapped.json.hookSpecificOutput.additionalContext, BOOTSTRAP_NAG);
+  assert.doesNotMatch(sessionText(dir), BOOTSTRAP_NAG);
 
   cleanup(dir);
 });
 
-test("context-inject: a repo with source files gets the retrofit nag, not genesis", () => {
+test("session-start: a repo with source files gets the retrofit nag, not genesis", () => {
   const dir = fixtureRepo();
   fs.writeFileSync(path.join(dir, "package.json"), "{}\n");
 
-  const nag = runHook("context-inject.js", { cwd: dir }).json.hookSpecificOutput
-    .additionalContext;
+  const nag = sessionText(dir);
   assert.match(nag, /maintain project/);
   assert.doesNotMatch(nag, /\/start/);
 
+  cleanup(dir);
+});
+
+// The whole point of the split: a fact that cannot change mid-session is said once at
+// session start, not re-injected on every prompt.
+test("context-inject: does not repeat the session-level bootstrap nag each turn", () => {
+  const dir = fixtureRepo();
+  const { json } = runHook("context-inject.js", { cwd: dir });
+  assert.doesNotMatch(json ? json.hookSpecificOutput.additionalContext : "", BOOTSTRAP_NAG);
   cleanup(dir);
 });
 
