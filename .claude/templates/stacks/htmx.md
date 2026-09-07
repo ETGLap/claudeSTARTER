@@ -28,3 +28,10 @@ Informs the spec→test→implement pipeline; never scaffolds code on its own.
 - Security: fragment endpoints need the same auth + CSRF as full pages.
 - Accessibility: swapped-in content is announced (`aria-live`) when it matters.
 - Performance: keep fragments small; never re-render the full page into a swap.
+
+## Test strategy
+
+Integration-test endpoints by asserting on the returned fragment's content, not its exact
+markup — the fragment is the contract, its formatting is not. Unit-test the domain logic
+behind the handler with no HTTP involved. Verify the no-JS fallback path explicitly; it is
+the criterion most easily assumed and least often checked.

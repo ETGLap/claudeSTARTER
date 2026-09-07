@@ -7,9 +7,10 @@ with reuse, quality, security, and architecture gates — automatically, no comm
 This file is the kit's manual for humans and travels with the `.claude/` folder; the
 host project's root `README.md` stays its own.
 
-Conductor is **not an app generator**. It adds zero runtime dependencies to your project:
-markdown instructions, four workflow skills, read-only specialist agents, and seven tiny
-zero-dependency Node hooks that shape *how* Claude works in your codebase.
+Conductor scaffolds **once**, at project genesis (`/start`), and never again — after that
+it shapes *how* Claude works in your codebase. There are no feature/CRUD/component
+generators. It adds zero runtime dependencies: markdown instructions, five workflow skills,
+path-scoped rules, read-only specialist agents, and seven tiny zero-dependency Node hooks.
 
 ## The spectrum map
 
@@ -38,7 +39,8 @@ This is also why enforcement is split by what can be trusted:
 
 **One automatic pipeline**, defined in `.claude/CLAUDE.md`:
 
-1. **Context** — kit manual + always-loaded gates · project context · nearest local `CLAUDE.md`
+1. **Context** — kit manual + always-loaded gates · project context · in-scope
+   `.claude/rules/` · nearest local `CLAUDE.md`
 2. **Plan** — spec first if the change is feature-sized (`/sdd`, then `/clear` and build via
    `/implement` in a fresh session) · analyze the requirement · run existing tests (green
    baseline) · reuse-first discovery · plan tests · write and commit the failing test (Red)
@@ -62,8 +64,8 @@ files; `review-performance`, `review-compatibility` and `review-documentation` t
 their descriptions.
 
 **Agents** (`.claude/agents/`) are read-only specialists Claude delegates discovery and
-audits to — spec-analyst (SDD discovery), architecture-scout, and
-security/performance/accessibility/docs/test auditors. Each returns a concise brief
+audits to — spec-analyst (SDD discovery), architecture-scout, stack-advisor (greenfield
+stack options), and security/performance/accessibility/docs/test auditors. Each returns a concise brief
 (findings · paths · risks · recommendation) and never implements; code changes — including
 writing the tests themselves — stay in the main session so Red→Green stays coupled.
 
@@ -74,18 +76,19 @@ writing the tests themselves — stay in the main session so Red→Green stays c
 
 ### New project
 
-1. Copy the `.claude/` folder into your repo root — that's the whole kit. Its
-   `CLAUDE.md` manual loads automatically; your project's own root `CLAUDE.md`
-   (philosophy, conventions, domain rules) is generated later by `/maintain project`
-   and imports the kit via `@.claude/CLAUDE.md`.
-2. Set your commands in `.claude/conductor.config.json`:
+1. Copy the `.claude/` folder into your repo root — that's the whole kit.
+2. Start Claude Code and describe what you want built:
 
-   ```json
-   { "testGate": { "command": "npm test" }, "format": { "command": "npx prettier --write" } }
+   ```text
+   /start a dashboard for tracking elevator inspections
    ```
 
-3. *(Optional)* Desktop notifications — set `notify.enabled: true` in the same file.
-4. Start Claude Code. The pipeline and the guards are automatic.
+   Genesis classifies the project, separates what you asked for from what it
+   professionally requires, recommends a stack and records it as an ADR, scaffolds the
+   toolchain, and sets `testGate.command` — stopping when that exits 0. Then it hands off
+   to `/sdd` and never scaffolds again.
+3. *(Optional)* Desktop notifications — set `notify.enabled: true` in
+   `.claude/conductor.config.json`.
 
 ### Existing project
 
