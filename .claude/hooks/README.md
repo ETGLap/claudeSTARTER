@@ -61,7 +61,7 @@ first author wins so a later typo fix cannot launder authorship). Turning off
 
 | Key | Default | Meaning |
 | --- | --- | --- |
-| `testGate.command` | `""` | Shell command the Stop gate runs. Empty = no-op. |
+| `testGate.command` | `""` | Shell command the Stop gate runs. **Ships empty on purpose** — a non-empty default would run the kit's own hook tests in your project and report green while your code is untested. `/start` and `/maintain project` set it. |
 | `testGate.maxBlocks` | `2` | Consecutive red blocks before the gate yields to you. |
 | `format.command` | `""` | Formatter, invoked as `<command> <file>`. Empty = no-op. |
 | `guards.*` | `true` | Each rule is individually disableable. The legacy `gitSafety: false` still turns off all three git/shell rules at once. |

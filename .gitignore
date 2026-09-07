@@ -42,3 +42,6 @@ config.env
 .claude/.state/
 # Working notes for the starter audit (not part of the kit)
 .tmp/
+
+# Starter-repo local gate wiring (not part of the kit)
+.claude/settings.local.json

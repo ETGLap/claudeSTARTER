@@ -202,7 +202,7 @@ remembering:
 | Before a file write | ADRs stay append-only · implemented specs must be superseded · secret files (`.env`, `*.pem`, `*.key`, `id_rsa*`) are blocked |
 | Before a shell command | Force pushes, commits on `main`/`master`, and recursive force deletes ask first |
 | After a file write | Your formatter runs on the file |
-| When Claude says "done" | Blocked while your test suite is red — skipped when nothing changed since the last green run |
+| When Claude says "done" | Blocked while your test suite is red — skipped when nothing changed since the last green run. Inert until `testGate.command` is set, so it never reports green on a suite that is not yours. |
 
 Guards ask rather than block, so you stay the authority. Tune or disable any of them in
 `.claude/conductor.config.json`.

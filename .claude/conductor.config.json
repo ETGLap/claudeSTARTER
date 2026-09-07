@@ -1,7 +1,7 @@
 {
   "testGate": {
     "enabled": true,
-    "command": "node --test .claude/hooks/*.test.js",
+    "command": "",
     "maxBlocks": 2
   },
   "format": {
