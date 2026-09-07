@@ -39,8 +39,24 @@ test("buildContext: says nothing about specs when there are none", () => {
 });
 
 test("buildContext: nudges bootstrap only while the project is un-bootstrapped", () => {
-  assert.match(buildContext({ needsBootstrap: true }), /maintain project/);
+  assert.match(buildContext({ needsBootstrap: "retrofit" }), /maintain project/);
   assert.doesNotMatch(buildContext({ needsBootstrap: false }), /maintain project/);
+});
+
+// An empty project and an un-retrofitted codebase need opposite advice: /maintain project
+// maps a codebase, and there is nothing to map before one exists. Sending genesis there is
+// the dead end the audit found, so the two paths must stay distinguishable.
+test("buildContext: sends an empty project to /start, not to /maintain project", () => {
+  const genesis = buildContext({ needsBootstrap: "genesis" });
+  assert.match(genesis, /\/start/);
+  assert.doesNotMatch(genesis, /maintain project/);
+});
+
+test("buildContext: treats a bare `true` as the retrofit path", () => {
+  // Back-compat: the flag used to be boolean. Defaulting to retrofit is the safe read —
+  // it never tells someone with a real codebase to scaffold over it.
+  assert.match(buildContext({ needsBootstrap: true }), /maintain project/);
+  assert.doesNotMatch(buildContext({ needsBootstrap: true }), /\/start/);
 });
 
 // Assert on the warning sentence itself, not on "/clear" — the standing pipeline line
