@@ -12,9 +12,47 @@ const os = require("node:os");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const { loadConfig } = require("./lib/config.js");
+const { shouldRunTests, treeSignature } = require("./lib/testgate.js");
 
 const TEST_TIMEOUT_MS = 10 * 60 * 1000;
 const REPORTED_LINES = 20;
+const GIT_TIMEOUT_MS = 5000;
+
+/** Current working-tree fingerprint, or null when git cannot answer (=> always run). */
+function currentSignature() {
+  try {
+    const git = (args) => {
+      const r = spawnSync("git", args, { encoding: "utf8", timeout: GIT_TIMEOUT_MS });
+      return r.status === 0 ? r.stdout : null;
+    };
+    return treeSignature(git(["rev-parse", "HEAD"]), git(["status", "--porcelain"]));
+  } catch {
+    return null;
+  }
+}
+
+/** Where the last run's record lives. Keyed by cwd so parallel projects stay separate. */
+function recordPath() {
+  const key = Buffer.from(process.cwd()).toString("hex").slice(0, 32);
+  return path.join(os.tmpdir(), `conductor-test-gate-run-${key}.json`);
+}
+
+const readRecord = (p) => {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(p, "utf8"));
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeRecord = (p, record) => {
+  try {
+    fs.writeFileSync(p, JSON.stringify(record));
+  } catch {
+    /* ignore */
+  }
+};
 
 // Per-project block counter so an unfixable suite cannot loop the session forever.
 // Keyed by cwd so parallel projects do not clobber each other.
@@ -62,11 +100,19 @@ const clearCounter = (p) => {
       return;
     }
 
+    // Stop fires every turn. Skip the suite when the tree is provably unchanged since a run
+    // that passed — anything unknown falls through and runs.
+    const record = recordPath();
+    const signature = currentSignature();
+    if (!shouldRunTests({ signature, last: readRecord(record) })) return;
+
     const result = spawnSync(command, {
       shell: true,
       encoding: "utf8",
       timeout: TEST_TIMEOUT_MS,
     });
+    writeRecord(record, { signature, green: result.status === 0 });
+
     if (result.status === 0) {
       clearCounter(counter); // green => reset
       return;
