@@ -2,10 +2,18 @@
 
 const test = require("node:test");
 const assert = require("node:assert");
-const { buildContext, PIPELINE } = require("./lib/context.js");
+const { buildContext, buildSessionStart } = require("./lib/context.js");
 
-test("buildContext: always carries the pipeline reminder", () => {
-  assert.ok(buildContext({}).includes(PIPELINE));
+// The pipeline lives in CLAUDE.md, which is already in context every turn. Restating it
+// per prompt bought nothing and cost tokens on every single turn forever.
+test("buildContext: does not restate the pipeline that CLAUDE.md already carries", () => {
+  const text = buildContext({ branch: "dev" });
+  assert.doesNotMatch(text, /spec-worthy work/);
+  assert.doesNotMatch(text, /reuse-check/);
+});
+
+test("buildContext: returns null when there is nothing session-specific to say", () => {
+  assert.strictEqual(buildContext({ testGate: { enabled: true, command: "npm test" } }), null);
 });
 
 test("buildContext: flags the default branch, stays quiet on a feature branch", () => {
@@ -17,15 +25,8 @@ test("buildContext: flags the default branch, stays quiet on a feature branch", 
   assert.doesNotMatch(onFeature, /default branch/);
 });
 
-test("buildContext: reports whether the test gate is armed", () => {
-  const armed = buildContext({ testGate: { enabled: true, command: "npm test" } });
-  assert.match(armed, /Test gate armed: `npm test`/);
-
-  const idle = buildContext({ testGate: { enabled: true, command: "" } });
-  assert.match(idle, /not armed/);
-
-  const off = buildContext({ testGate: { enabled: false, command: "npm test" } });
-  assert.match(off, /not armed/);
+test("buildContext: no longer reports gate arming — that is a session-level fact", () => {
+  assert.strictEqual(buildContext({ testGate: { enabled: true, command: "npm test" }, branch: "dev" }).includes("Test gate armed"), false);
 });
 
 test("buildContext: surfaces approved specs waiting to be implemented", () => {
@@ -34,33 +35,40 @@ test("buildContext: surfaces approved specs waiting to be implemented", () => {
 });
 
 test("buildContext: says nothing about specs when there are none", () => {
-  assert.doesNotMatch(buildContext({ approvedSpecs: [] }), /awaiting/);
-  assert.doesNotMatch(buildContext({}), /awaiting/);
+  assert.doesNotMatch(buildContext({ approvedSpecs: [] }) || "", /awaiting/);
+  assert.doesNotMatch(buildContext({}) || "", /awaiting/);
 });
 
-test("buildContext: nudges bootstrap only while the project is un-bootstrapped", () => {
-  assert.match(buildContext({ needsBootstrap: "retrofit" }), /maintain project/);
-  assert.doesNotMatch(buildContext({ needsBootstrap: false }), /maintain project/);
+// Bootstrap state is a per-session fact, so it moved to SessionStart. Repeating it on
+// every prompt was pure duplication.
+test("buildSessionStart: nudges bootstrap only while the project is un-bootstrapped", () => {
+  assert.match(buildSessionStart({ needsBootstrap: "retrofit" }), /maintain project/);
+  assert.strictEqual(buildSessionStart({ needsBootstrap: false, testGate: { enabled: true, command: "npm test" } }), null);
 });
 
 // An empty project and an un-retrofitted codebase need opposite advice: /maintain project
 // maps a codebase, and there is nothing to map before one exists. Sending genesis there is
 // the dead end the audit found, so the two paths must stay distinguishable.
-test("buildContext: sends an empty project to /start, not to /maintain project", () => {
-  const genesis = buildContext({ needsBootstrap: "genesis" });
+test("buildSessionStart: sends an empty project to /start, not to /maintain project", () => {
+  const genesis = buildSessionStart({ needsBootstrap: "genesis" });
   assert.match(genesis, /\/start/);
   assert.doesNotMatch(genesis, /maintain project/);
 });
 
-test("buildContext: treats a bare `true` as the retrofit path", () => {
+test("buildSessionStart: treats a bare `true` as the retrofit path", () => {
   // Back-compat: the flag used to be boolean. Defaulting to retrofit is the safe read —
   // it never tells someone with a real codebase to scaffold over it.
-  assert.match(buildContext({ needsBootstrap: true }), /maintain project/);
-  assert.doesNotMatch(buildContext({ needsBootstrap: true }), /\/start/);
+  assert.match(buildSessionStart({ needsBootstrap: true }), /maintain project/);
+  assert.doesNotMatch(buildSessionStart({ needsBootstrap: true }), /\/start/);
 });
 
-// Assert on the warning sentence itself, not on "/clear" — the standing pipeline line
-// mentions /clear too, so matching that would pass whether or not the warning fired.
+test("buildSessionStart: says once that the test gate is unarmed", () => {
+  assert.match(buildSessionStart({ testGate: { enabled: true, command: "" } }), /not armed/);
+  assert.doesNotMatch(buildSessionStart({ testGate: { enabled: true, command: "npm test" } }) || "", /not armed/);
+});
+
+// Assert on the warning sentence itself rather than on "/clear", so the test stays honest
+// about which line fired.
 const WARNING = /(Spec|Specs) .+ (was|were) written in this session\./;
 
 test("buildContext: warns when a spec was written in this very session", () => {
@@ -77,8 +85,8 @@ test("buildContext: pluralises the warning for several specs", () => {
 });
 
 test("buildContext: no same-session warning when the spec came from elsewhere", () => {
-  assert.doesNotMatch(buildContext({ sameSessionSpecs: [] }), WARNING);
-  assert.doesNotMatch(buildContext({}), WARNING);
+  assert.doesNotMatch(buildContext({ sameSessionSpecs: [] }) || "", WARNING);
+  assert.doesNotMatch(buildContext({}) || "", WARNING);
 });
 
 test("buildContext: a same-session spec is not also listed as simply pending", () => {
