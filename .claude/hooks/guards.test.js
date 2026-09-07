@@ -186,3 +186,35 @@ test("decideBash: gitSafety off disables the git rules", () => {
     null
   );
 });
+
+// --force-with-lease is the *safe* form: it refuses if the remote moved since you fetched.
+// Prompting on it identically to --force trains you to click through both.
+test("decideBash: --force-with-lease pushes without a prompt", () => {
+  assert.strictEqual(decideBash({ command: "git push --force-with-lease origin feat" }), null);
+});
+
+test("decideBash: a bare --force push still asks", () => {
+  const d = decideBash({ command: "git push --force origin feat" });
+  assert.strictEqual(d.permissionDecision, "ask");
+});
+
+// One toggle for three unrelated rules meant turning off the rm guard also disabled the
+// branch guard. Each rule gets its own key, defaulting on.
+test("decideBash: each git-safety rule is disableable on its own", () => {
+  const rm = "rm -rf build";
+  const push = "git push --force origin feat";
+  assert.strictEqual(decideBash({ command: rm, config: { recursiveDelete: false } }), null);
+  assert.ok(decideBash({ command: push, config: { recursiveDelete: false } }));
+  assert.strictEqual(decideBash({ command: push, config: { forcePush: false } }), null);
+  assert.ok(decideBash({ command: rm, config: { forcePush: false } }));
+  assert.strictEqual(
+    decideBash({ command: "git commit -m x", branch: "main", config: { defaultBranchCommit: false } }),
+    null
+  );
+});
+
+// Back-compat: the old single key still turns everything off.
+test("decideBash: legacy gitSafety:false still disables every rule", () => {
+  assert.strictEqual(decideBash({ command: "rm -rf build", config: { gitSafety: false } }), null);
+  assert.strictEqual(decideBash({ command: "git push --force x", config: { gitSafety: false } }), null);
+});
