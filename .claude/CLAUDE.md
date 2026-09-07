@@ -76,7 +76,8 @@ Reviewers are lenses while you work, gates before you move on.
 4. Review — refactor your own change while green · quality · security · placement ·
    conditional lenses, only in scope: `review-performance` (hot paths) ·
    `review-accessibility-web` / `-native` (UI) · `review-compatibility` (multi-platform) ·
-   `review-documentation` (behavior/interfaces changed) · re-run tests.
+   `review-documentation` (behavior/interfaces changed) · `review-ux` (user-operable) ·
+   re-run tests.
 5. Finish — final gate · propose `/docs` if behavior or interfaces changed · flag stale
    `project-context.md` if stack/commands/architecture/deps changed.
 6. Report — changed · tested · not verified · risks. Short and honest.
@@ -93,13 +94,15 @@ explicit request — behavior-preserving and test-gated.
   the source of truth for `/implement`.
 - `/implement [spec]` — build an approved spec through the TDD pipeline; no separate
   /tdd — verification criteria become the failing tests.
+- `/debug <symptom>` — reproduce → isolate → hypothesis → failing test → fix. Bugs skip the
+  spec, not the test.
 - `/docs` — audit docs vs code, update `docs-vault/` from `.claude/templates/docs/`
   (propose first; never overwrite human prose; ADRs append-only).
 - `/maintain` — trim the `.claude/` system + refresh `project-context.md` ·
   `project` scope: recurring architecture/structure audit → plan → gated refactors;
   first run on an existing codebase bootstraps context and docs (the retrofit).
 - `review-performance` · `review-accessibility-web` · `review-accessibility-native` · `review-compatibility` ·
-  `review-documentation` — scope-gated lenses that load only when a change is in scope.
+  `review-documentation` · `review-ux` — scope-gated lenses that load only in scope.
 
 ## Agents (`.claude/agents/`)
 

@@ -1,0 +1,38 @@
+name: test
+
+on:
+  push:
+    branches: [main, development]
+  pull_request:
+
+jobs:
+  hooks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # The explicit glob is required: Node's test discovery skips dot-directories, so
+      # passing the bare directory finds nothing and silently "passes".
+      - run: node --test .claude/hooks/*.test.js
+
+  wiring:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: settings.json and conductor.config.json parse
+        run: |
+          python3 -c "import json;json.load(open('.claude/settings.json'))"
+          python3 -c "import json;json.load(open('.claude/conductor.config.json'))"
+      - name: every @import in the kit manual resolves
+        run: |
+          cd .claude
+          grep -o '^@[^ ]*' CLAUDE.md | sed 's/^@//' | while read -r f; do
+            test -f "$f" || { echo "missing import: $f"; exit 1; }
+          done
+      - name: every hook referenced by settings.json exists
+        run: |
+          grep -o '\.claude/hooks/[a-z-]*\.js' .claude/settings.json | sort -u | while read -r f; do
+            test -f "$f" || { echo "missing hook: $f"; exit 1; }
+          done

@@ -12,24 +12,24 @@ const path = require("node:path");
 const { run, additionalContext } = require("./lib/io.js");
 const { loadConfig } = require("./lib/config.js");
 const { currentBranch } = require("./lib/git.js");
-const { buildContext } = require("./lib/context.js");
+const { buildContext, selectApproved } = require("./lib/context.js");
 const { authorOf, loadLedger } = require("./lib/spec-state.js");
 
 const SPECS_DIR = "docs-vault/specs";
-const MAX_SPECS_SCANNED = 40;
+const MAX_SPECS_LISTED = 40;
 
 /** Spec slugs whose front block says `Status: approved`. */
 function approvedSpecs(cwd) {
   try {
-    return fs
-      .readdirSync(path.join(cwd, SPECS_DIR))
-      .filter((name) => name.endsWith(".md"))
-      .slice(0, MAX_SPECS_SCANNED)
-      .filter((name) => {
-        const text = fs.readFileSync(path.join(cwd, SPECS_DIR, name), "utf8").slice(0, 800);
-        return /^\s*Status:\s*approved\b/im.test(text);
-      })
-      .map((name) => name.replace(/\.md$/, ""));
+    const dir = path.join(cwd, SPECS_DIR);
+    return selectApproved(
+      fs.readdirSync(dir),
+      (name) =>
+        /^\s*Status:\s*approved\b/im.test(
+          fs.readFileSync(path.join(dir, name), "utf8").slice(0, 800)
+        ),
+      MAX_SPECS_LISTED
+    );
   } catch {
     return []; // no docs-vault yet — nothing to report
   }

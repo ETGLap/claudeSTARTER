@@ -77,4 +77,21 @@ function buildSessionStart(state = {}) {
   return lines.length > 0 ? lines.join("\n") : null;
 }
 
-module.exports = { buildContext, buildSessionStart };
+/**
+ * Pick approved spec slugs, newest first, capped.
+ *
+ * The cap must apply *after* the status filter: capping the scan first meant an approved
+ * spec past the cap simply vanished from the injected context, and readdir order made which
+ * ones vanished arbitrary. Sorting descending keeps the most recent specs visible.
+ */
+function selectApproved(names, isApproved, cap) {
+  return [...names]
+    .filter((name) => name.endsWith(".md"))
+    .sort()
+    .reverse()
+    .filter((name) => isApproved(name))
+    .slice(0, cap)
+    .map((name) => name.replace(/\.md$/, ""));
+}
+
+module.exports = { buildContext, buildSessionStart, selectApproved };

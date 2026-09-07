@@ -11,6 +11,7 @@ const fs = require("node:fs");
 const { spawnSync } = require("node:child_process");
 const { run, additionalContext } = require("./lib/io.js");
 const { loadConfig } = require("./lib/config.js");
+const { resolveTarget } = require("./lib/paths.js");
 
 const FORMAT_TIMEOUT_MS = 20000;
 
@@ -20,8 +21,10 @@ run((payload) => {
   const { format } = loadConfig();
   if (!format.enabled || !format.command.trim()) return null;
 
-  const filePath = payload.tool_input?.file_path;
-  if (typeof filePath !== "string" || !fs.existsSync(filePath)) return null;
+  // Resolve against the payload cwd, exactly as guard-writes.js does: a relative path with
+  // a diverged cwd would otherwise miss and the formatter would silently do nothing.
+  const filePath = resolveTarget(payload.cwd, payload.tool_input?.file_path);
+  if (!filePath || !fs.existsSync(filePath)) return null;
 
   const before = fs.readFileSync(filePath, "utf8");
   spawnSync(`${format.command} ${quote(filePath)}`, {

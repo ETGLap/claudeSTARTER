@@ -131,7 +131,7 @@ CLAUDE.md                     Project-owned: philosophy · conventions · domain
 │   ├── mobile.md             shared by default · native a11y · manual device checks
 │   └── tests.md              one behavior per test · expected values from the spec
 ├── skills/                   On-demand layer
-│   ├── start · sdd · implement · docs · maintain   The five workflows
+│   ├── start · sdd · implement · debug · docs · maintain   The six workflows
 │   └── review-performance · review-accessibility-web · review-accessibility-native ·
 │       review-documentation                     Scope-gated lenses
 ├── agents/                   Read-only specialists: discovery + audits, never implement
@@ -149,6 +149,7 @@ CLAUDE.md                     Project-owned: philosophy · conventions · domain
 | `/start <what to build>` | Project genesis for an empty repo: classify → triage explicit/inferred/optional requirements → decide the stack (written as ADR 0001) → scaffold the toolchain → wire `testGate.command` → generate root `CLAUDE.md` + context → hand off to `/sdd`. The only time the kit scaffolds. |
 | `/sdd <idea>` | Idea → read-only discovery → interactive interview → six-element spec (outcomes · scope · constraints · prior decisions · tasks · verification) in `docs-vault/specs/`. |
 | `/implement [spec]` | Build an approved spec through the TDD pipeline — verification criteria become the failing tests. No arg: pick from the approved-spec list. |
+| `/debug <symptom>` | Reproduce → isolate → hypothesize → capture the bug in a failing test → fix the cause. Stops and asks if it cannot reproduce. |
 | `/docs` | Audit docs against code, then update `docs-vault/` (Obsidian-style, wiki-linked) from the templates. Proposes before writing; ADRs are append-only. |
 | `/maintain` | Trim the `.claude/` system and refresh `project-context.md`. `/maintain project`: recurring gated audit of architecture, structure, reuse, and scalability — its first run retrofits an existing codebase. |
 | `review-*` | Four scope-gated lenses. Loaded automatically when in scope; also invocable by name. |
