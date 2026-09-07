@@ -40,10 +40,10 @@ re-checks this mapping.
   global constraints live in the root `CLAUDE.md` and `project-context.md`, never
   repeated per spec.
 - Stack-specific knowledge is opt-in: copy a pack from `.claude/templates/stacks/` to
-  `.claude/skills/<stack>/SKILL.md`. Packs inform the pipeline; nothing ever scaffolds
-  code outside spec→test→implement.
-- Scale ceremony to risk: no-behavior changes (docs, comments, config text) skip Red-Green
-  but still get verification and the report.
+  `.claude/skills/<stack>/SKILL.md` (`/start` copies the matching one). Packs inform the
+  pipeline; they are knowledge, never generators.
+- Scale ceremony to risk: no-behavior changes (docs, comments, config text) and project
+  genesis (`/start`) skip Red-Green but still get verification and the report.
 - Reuse first: search for existing code and patterns to reuse or extend; a duplicate is
   the last resort.
 - Delegate exploration: information-gathering runs in read-only subagents that return a
@@ -137,6 +137,7 @@ that is easiest to edit.
 
 These apply to every change. Imported, not linked, so they are always in context.
 
+@reviewers/requirements.md
 @reviewers/tdd.md
 @reviewers/quality.md
 @reviewers/security.md

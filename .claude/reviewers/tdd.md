@@ -6,6 +6,11 @@ Order is the whole point. Tests written after the code verify the code, not the 
 broken code plus tests written to match it passes cleanly. Writing the test first locks in
 what correct means before an implementation exists to bias it.
 
+**Genesis and spikes are exempt.** Establishing a toolchain, test runner, or project
+skeleton, and time-boxed spikes, are exempt from Red-Green. The exit condition for genesis
+is a runnable test command; the first behavior implemented after that is test-first. A
+spike's exit condition is a decision — throw the spike away and rebuild it test-first.
+
 - [ ] Expected behavior defined — verification criteria from the governing spec (if any) seed the tests.
 - [ ] Expected values come from the spec or the user, never from running the code first.
 - [ ] Relevant existing tests run first — green baseline established.
