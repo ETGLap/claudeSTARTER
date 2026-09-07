@@ -29,6 +29,18 @@ test("buildContext: no longer reports gate arming — that is a session-level fa
   assert.strictEqual(buildContext({ testGate: { enabled: true, command: "npm test" }, branch: "dev" }).includes("Test gate armed"), false);
 });
 
+// The scan used to slice to a cap BEFORE filtering by status, with arbitrary readdir order,
+// so past the cap an approved spec could simply vanish from the injected context.
+test("selectApproved: the cap applies to approved specs, not to files scanned", () => {
+  const { selectApproved } = require("./lib/context.js");
+  const names = [];
+  for (let i = 1; i <= 60; i += 1) names.push(`${String(i).padStart(4, "0")}-spec.md`);
+  // Only the last three are approved, so a slice-then-filter would return none of them.
+  const approved = new Set(["0058-spec.md", "0059-spec.md", "0060-spec.md"]);
+  const picked = selectApproved(names, (n) => approved.has(n), 40);
+  assert.deepStrictEqual(picked, ["0060-spec", "0059-spec", "0058-spec"]);
+});
+
 test("buildContext: surfaces approved specs waiting to be implemented", () => {
   const text = buildContext({ approvedSpecs: ["0003-checkout", "0004-search"] });
   assert.match(text, /0003-checkout, 0004-search/);

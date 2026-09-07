@@ -130,6 +130,22 @@ test("context-inject: reports branch and pending approved specs", () => {
   cleanup(dir);
 });
 
+// format.js used to read file_path straight off the payload while guard-writes.js resolved
+// it against payload.cwd. A relative path with a diverged cwd therefore failed existsSync
+// and the formatter silently did nothing — the worst kind of failure for a guarantee hook.
+test("format: resolves a relative file_path against the payload cwd", () => {
+  const dir = fixtureRepo();
+  const rel = "docs-vault/decisions/0001-a.md";
+  const { code } = runHook("format.js", { cwd: dir, tool_input: { file_path: rel } });
+  assert.strictEqual(code, 0);
+
+  const { resolveTarget } = require("./lib/paths.js");
+  assert.strictEqual(resolveTarget(dir, rel), path.join(dir, rel));
+  assert.strictEqual(resolveTarget(dir, path.join(dir, rel)), path.join(dir, rel));
+  assert.strictEqual(resolveTarget(dir, null), null);
+  cleanup(dir);
+});
+
 test("format: stays silent when no formatter is configured", () => {
   const { code, json } = runHook("format.js", {
     tool_input: { file_path: path.join(HOOKS, "format.js") },
