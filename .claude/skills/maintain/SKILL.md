@@ -36,7 +36,7 @@ project has nothing to map: send it to `/start` instead.
    overwrite an existing root CLAUDE.md without asking) · generate docs via `/docs`
    (incl. the "Shared building blocks" reuse map) · set `testGate.command` and
    `format.command` in `.claude/conductor.config.json`.
-2. Audit (read-only) — fan out the `architecture-scout` agent plus relevant auditors:
+2. Audit (read-only) — fan out the `discovery` agent plus relevant auditors:
    folder structure, reuse/duplication, UI/theme consistency, database layer,
    frontend/backend organization, quality + refactoring debt, test gaps, security,
    scalability as the project grows. Prioritize findings.

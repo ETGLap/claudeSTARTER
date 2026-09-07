@@ -103,8 +103,7 @@ explicit request — behavior-preserving and test-gated.
 
 ## Agents (`.claude/agents/`)
 
-Read-only specialists for discovery and audits (spec-analyst, architecture-scout,
-stack-advisor, security/performance/accessibility/docs/test auditors). They return concise
+Read-only specialists for discovery and audits (discovery, stack-advisor, security/performance/accessibility/docs/test auditors). They return concise
 briefs and never implement. They inherit this file, so the gates below apply to them too —
 the built-in `Explore` and `Plan` agents do not; see `policy/delegation.md`.
 
@@ -165,7 +164,5 @@ These apply to every change. Imported, not linked, so they are always in context
 @reviewers/quality.md
 @reviewers/security.md
 @reviewers/architecture.md
-@reviewers/refactoring.md
 @reviewers/spec.md
-@reviewers/final.md
 @policy/delegation.md

@@ -15,7 +15,7 @@ workflow references. Specs describe behavior, not implementation.
    when unsure, offer a one-paragraph mini-spec (Outcomes + Verification only).
    If the project has no application code or toolchain yet, this is genesis, not a spec —
    stop and recommend `/start`, which ends by handing back here.
-2. Discover (read-only) — delegate to the `spec-analyst` and `architecture-scout` agents:
+2. Discover (read-only) — delegate to the `discovery` agent (both lenses: behavior and reuse):
    existing behavior, reusable code, prior decisions, constraints. Independent questions →
    parallel agents.
 3. Interview — walk the six elements **in order, one element at a time**; batch questions

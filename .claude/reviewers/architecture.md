@@ -2,7 +2,7 @@
 
 Reuse before create; keep the system consistent. Runs at plan time (reuse decision) and
 review time (placement). Check `docs-vault/architecture.md` "Shared building blocks" (the
-reuse map) first if present; on a large codebase, search via the read-only `architecture-scout` agent;
+reuse map) first if present; on a large codebase, search via the read-only `discovery` agent;
 greenfield → there is nothing to reuse yet, so the question is placement, not reuse:
 take the starting structure from `.claude/reference/architectures.md` (`/start` does this).
 

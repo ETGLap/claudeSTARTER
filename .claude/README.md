@@ -53,8 +53,8 @@ This is also why enforcement is split by what can be trusted:
 
 **Gates** (`.claude/reviewers/` + `.claude/policy/delegation.md`) are `@`-imported by the kit
 manual, so they are genuinely in context every session rather than a path the model might
-read: requirements, architecture (reuse before create), TDD, quality, security, refactoring,
-spec, final. The kit's own agents load `CLAUDE.md`, so they inherit these too — but the
+read: requirements, architecture (reuse before create), TDD, quality (which absorbs
+refactoring and the final gate), security, spec. The kit's own agents load `CLAUDE.md`, so they inherit these too — but the
 built-in `Explore` and `Plan` agents deliberately skip it, which is why
 [`policy/delegation.md`](policy/delegation.md) routes gated work to the named specialists.
 
@@ -64,8 +64,7 @@ the right one for the platform; `review-performance`, `review-compatibility` and
 their descriptions.
 
 **Agents** (`.claude/agents/`) are read-only specialists Claude delegates discovery and
-audits to — spec-analyst (SDD discovery), architecture-scout, stack-advisor (greenfield
-stack options), and security/performance/accessibility/docs/test auditors. Each returns a concise brief
+audits to — discovery (reuse + existing behavior), stack-advisor (greenfield stack options), and security/performance/accessibility/docs/test auditors. Each returns a concise brief
 (findings · paths · risks · recommendation) and never implements; code changes — including
 writing the tests themselves — stay in the main session so Red→Green stays coupled.
 
@@ -121,11 +120,10 @@ CLAUDE.md                     Project-owned: philosophy · conventions · domain
 ├── reviewers/                Always-on gates, @imported by the kit manual
 │   ├── architecture.md       Reuse before create; placement and consistency
 │   ├── tdd.md                Red → Green → Refactor; green baseline first
-│   ├── quality.md            Smallest, cleanest change; error handling
+│   ├── quality.md            Smallest, cleanest change + refactoring + the final gate
 │   ├── security.md           Proportional to risk
-│   ├── refactoring.md        Own-change automatic; pre-existing code on request only
-│   ├── spec.md               Six elements; behavior not implementation
-│   └── final.md              Last gate before the response
+│   ├── requirements.md       Explicit vs inferred vs optional
+│   └── spec.md               Six elements; behavior not implementation
 ├── rules/                    Path-scoped conventions — load only in scope
 │   ├── frontend.md           components · props in, events out · states
 │   ├── backend.md            thin handlers · validate at the boundary · authz

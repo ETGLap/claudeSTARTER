@@ -7,8 +7,7 @@ usages, understanding an existing feature or architecture, finding reusable code
 dependencies, reviewing docs/tests/config, researching libraries or APIs. Independent
 questions → parallel subagents, one per aspect; combine their summaries before deciding.
 
-**Use the named specialists in `.claude/agents/`** (spec-analyst, architecture-scout,
-stack-advisor, security/performance/accessibility/docs/test auditors). They load the kit
+**Use the named specialists in `.claude/agents/`** (discovery, stack-advisor, security/performance/accessibility/docs/test auditors). They load the kit
 manual, so every gate above applies inside them; all are read-only and return the same
 brief format.
 
