@@ -1,0 +1,87 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node '/Users/malamutlemit/Desktop/Projects/Application/claudeSTARTER/.codex/hooks/guard-writes.js'",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node '/Users/malamutlemit/Desktop/Projects/Application/claudeSTARTER/.codex/hooks/guard-bash.js'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node '/Users/malamutlemit/Desktop/Projects/Application/claudeSTARTER/.codex/hooks/format.js'",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "node '/Users/malamutlemit/Desktop/Projects/Application/claudeSTARTER/.codex/hooks/spec-session.js'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node '/Users/malamutlemit/Desktop/Projects/Application/claudeSTARTER/.codex/hooks/session-start.js'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node '/Users/malamutlemit/Desktop/Projects/Application/claudeSTARTER/.codex/hooks/context-inject.js'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node '/Users/malamutlemit/Desktop/Projects/Application/claudeSTARTER/.codex/hooks/test-gate.js'"
+          },
+          {
+            "type": "command",
+            "command": "node '/Users/malamutlemit/Desktop/Projects/Application/claudeSTARTER/.codex/hooks/notify.js' stop"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"${CLAUDE_PROJECT_DIR}\" && node --test .claude/hooks/*.test.js >/dev/null 2>&1 || echo '{\"decision\":\"block\",\"reason\":\"Kit tests are red — run: node --test .claude/hooks/*.test.js\"}'"
+          }
+        ]
+      }
+    ]
+  }
+}
