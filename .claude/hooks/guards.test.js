@@ -112,8 +112,7 @@ test("decideWrite: every rule is individually disableable", () => {
   );
 });
 
-// --force-with-lease deliberately omitted: it carries its own protection (it refuses when
-// the remote moved since your last fetch), so it is exempted below rather than prompted on.
+// Every history-rewriting push requires approval, including leases and forced refspecs.
 test("decideBash: force-push asks first", () => {
   for (const command of ["git push --force", "git push -f origin main"]) {
     const hit = decideBash({ command, branch: "feature", config: ON });
@@ -185,10 +184,35 @@ test("decideBash: gitSafety off disables the git rules", () => {
   );
 });
 
-// --force-with-lease is the *safe* form: it refuses if the remote moved since you fetched.
-// Prompting on it identically to --force trains you to click through both.
-test("decideBash: --force-with-lease pushes without a prompt", () => {
-  assert.strictEqual(decideBash({ command: "git push --force-with-lease origin feat" }), null);
+// A lease reduces concurrency risk but does not authorize rewriting remote history.
+test("decideBash: --force-with-lease still requires history-rewrite approval", () => {
+  assert.equal(decideBash({ command: "git push --force-with-lease origin feat" }).permissionDecision, "ask");
+});
+
+test("example env files are public templates, other env files remain protected", () => {
+  assert.equal(decideWrite({ filePath: "config/.env.example" }), null);
+  for (const filePath of [".env.example.local", ".env.production", "config/.env"]) {
+    assert.equal(decideWrite({ filePath }).permissionDecision, "deny");
+  }
+});
+
+test("absolute commands and forced refspecs ask without matching quoted prose", () => {
+  for (const command of ["/bin/rm -rf build", "'/bin/rm' -rf build", "/usr/bin/git push origin +HEAD:main", "git push --force-with-lease --force origin main"]) {
+    assert.equal(decideBash({ command }).permissionDecision, "ask", command);
+  }
+  for (const command of ["echo 'safe; rm -rf demo'", "git log --grep='push --force'", "git commit -m 'push --force'", "git show 'commit'"]) {
+    assert.equal(decideBash({ command, branch: "feature" }), null, command);
+  }
+});
+
+test("commit checks ask when an earlier command changes the target repository or branch", () => {
+  for (const command of ["cd other && git commit -m x", "git -C other commit -m x", "git switch main && git commit -m x"]) {
+    assert.equal(decideBash({ command, branch: "feature" }).permissionDecision, "ask", command);
+  }
+});
+
+test("Git environment overrides make a commit's branch uncertain", () => {
+  assert.equal(decideBash({ command: "GIT_DIR=/other/.git GIT_WORK_TREE=/other git commit -m x", branch: "feature" }).permissionDecision, "ask");
 });
 
 test("decideBash: a bare --force push still asks", () => {

@@ -21,5 +21,6 @@ Applies when working on schema, migrations, or data access.
   cost writes for no measured gain.
 - Constraints belong in the database, not only in application code — the database is the
   last place that can enforce them.
-- A destructive migration (drop, narrow a type, remove a column) gets explicit confirmation
-  before it runs anywhere but a local machine.
+- Running a migration requires explicit authorization in every environment, including
+  local. Prior authorization for that operation counts; explain destructive effects before
+  requesting any missing approval.

@@ -17,8 +17,7 @@ Report a near-duplicate as reusable even when it is not a perfect fit — a miss
 is a parameter, not a reason to build a second one. Say plainly when there is genuinely
 nothing to reuse; a greenfield answer is a real answer, not a failure to search.
 
-The Architecture and Spec gates are already in your context via the kit manual — apply them
-as the lens, do not restate them.
+Read `.claude/reviewers/architecture.md` only when placement or reuse is in question.
 
-Return a concise brief: findings · file paths/symbols · risks · recommendation.
+Return a brief of about 300 words unless more is needed: findings · file paths/symbols · risks · recommendation.
 Never implement; never return the exploration log.

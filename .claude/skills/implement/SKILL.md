@@ -1,44 +1,28 @@
 ---
 name: implement
-description: Build an approved spec through the full TDD pipeline — the spec's verification criteria become the failing tests. Use when the user asks to build, implement, or start work on a spec that already exists in docs-vault/specs/.
-when_to_use: An approved spec exists and the user wants it built. Trigger phrases: "implement the spec", "build 0004", "let's do the checkout spec", "start on that feature".
+description: Implement an approved spec through test-first changes, scoped review and documentation. Use when the user asks to build an existing specification.
 argument-hint: [spec-number-or-slug]
 ---
 
 # /implement
 
-Build an approved spec through the full pipeline. TDD is embedded — there is no separate
-/tdd command; the spec's verification criteria become the failing tests.
-
-1. Select — with `$ARGUMENTS`: resolve the spec by number or slug in `docs-vault/specs/`.
-   Without: list specs with `Status: approved`, ask which. Refuse `draft` (offer to run the
-   Spec gate first); warn before re-running an `implemented` one.
-   If the injected context flags this spec as written in the current session, say so and
-   recommend `/clear` first — the fresh-session test only means something in a fresh
-   session. Proceed if the user declines, and note it in the final report.
-2. Context — deliberately narrow: the spec, the CLAUDE.md files (kit `.claude/CLAUDE.md` +
-   project root), `.claude/context/project-context.md`, and the spec's linked prior
-   decisions and ADRs. Nothing else. If the spec is ambiguous, that is a spec defect, not
-   something to resolve by guessing — ask, then fix the spec.
-3. Baseline — run existing tests green before touching code.
-4. Red — delegate test-landscape discovery to the `test-auditor` agent (reusable fixtures,
-   patterns, placement), then derive failing tests from the spec's §6 verification
-   criteria: automated ones become tests; manual/acceptance ones are noted for the report.
-   Expected values come from the spec, never from running the code. Run them, show the
-   failure, then commit **the test files only**:
-   `git commit -m "test: <behavior> (red)"` — git is the record that test-first happened.
-5. Green — smallest change that passes; reuse before create. A red test is fixed in the
-   implementation, never by weakening the test. Commit when green.
-6. Refactor — your own change only, tests stay green.
-7. Review — always: quality · security · architecture. By classification, invoke the
-   matching scope-gated skill: `review-performance` (hot paths/data volume) ·
-   `review-accessibility-web` / `-native` (UI-facing) · `review-compatibility` (multi-platform) ·
-   `review-documentation` (behavior/interfaces changed) · `review-ux` (user-operable).
-8. Finish — final gate · propose `/docs` · mark the spec `Status: implemented` and check
-   off its verification criteria · report: changed · tested · not verified · risks.
-   Report every gap the spec had — ambiguous terms, missing data details, undefined edge
-   cases, assumed knowledge of existing code. Each one is a spec defect the fresh session
-   exposed; fix the spec, and say what it was missing.
-
-This is the only workflow in the kit that commits on its own, and only for the Red and
-Green steps described above.
+1. Select — resolve the requested spec in `docs-vault/specs/`. If one approved spec clearly
+   matches, use it; ask only if the target is ambiguous. Drafts need scope approval; existing
+   user authorization counts. Confirm missing manual/acceptance evidence before claiming done.
+2. Context — read the spec, applicable project instructions, relevant code and linked decisions.
+   Avoid reloading unrelated research. Clarify material ambiguities and update the spec.
+3. Baseline — run relevant existing checks. Separate pre-existing failures from the change;
+   do not silently waive them or claim the full suite passes.
+4. Red — inspect existing tests locally; discovery can map a large unfamiliar suite. Turn automated verification criteria into failing tests,
+   run them and confirm the intended failure. Track manual criteria separately.
+5. Green — make the smallest change that passes, reusing existing code. Correct a mistaken
+   test only against independent requirements and explain the evidence; never weaken it just
+   to accommodate the implementation. Refactor only your own change while tests stay green.
+6. Review — check correctness, scope, error handling and security once. Read specialized
+   references only for relevant risks. High-risk changes get independent review when available.
+7. Finish — format changed files together, then run the relevant full checks once. Reuse
+   a passing result if its inputs have not changed. Update affected docs
+   and project context. Mark implemented only after agreed criteria pass; leave unverified
+   manual criteria unchecked and the spec approved if they prevent acceptance.
+8. Report — changed, verified, remaining gaps and risks. Record spec defects found along the
+   way. Commit only under user/project authorization; separate Red/Green commits are optional.

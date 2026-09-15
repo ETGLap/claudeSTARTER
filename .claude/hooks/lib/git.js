@@ -34,7 +34,13 @@ function resolveGitDir(cwd) {
 /** Current branch for a working directory, or null if unknown (never throws). */
 function currentBranch(cwd = process.cwd()) {
   try {
-    const gitDir = resolveGitDir(cwd);
+    let root = path.resolve(cwd);
+    while (!fs.existsSync(path.join(root, ".git"))) {
+      const parent = path.dirname(root);
+      if (parent === root) return null;
+      root = parent;
+    }
+    const gitDir = resolveGitDir(root);
     if (!gitDir) return null;
     return parseHead(fs.readFileSync(path.join(gitDir, "HEAD"), "utf8"));
   } catch {

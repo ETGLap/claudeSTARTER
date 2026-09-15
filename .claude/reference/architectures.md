@@ -95,7 +95,7 @@ Backends with no UI of their own.
   load time is measurably a problem
 - **Test strategy:** unit-test **pure** logic — collision math, scoring, state transitions.
   Game feel, timing, and animation are **manual verification, documented** — this is the
-  case `reviewers/tdd.md` means by "if tests are impossible". Do not chase coverage here.
+  case for documenting manual verification when automated tests add little value. Do not chase coverage here.
 
 ## CLI / library
 

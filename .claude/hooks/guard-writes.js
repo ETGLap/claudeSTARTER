@@ -11,14 +11,7 @@ const path = require("node:path");
 const { run, preToolUse } = require("./lib/io.js");
 const { loadConfig } = require("./lib/config.js");
 const { decideWrite } = require("./lib/guards.js");
-
-// Write/Edit/MultiEdit use file_path; NotebookEdit uses notebook_path.
-const targetOf = (input) =>
-  typeof input?.file_path === "string"
-    ? input.file_path
-    : typeof input?.notebook_path === "string"
-      ? input.notebook_path
-      : null;
+const { targetsOf } = require("./lib/paths.js");
 
 /** Read a file only when it is small enough to be a spec — never slurp a binary. */
 function readIfSmall(filePath) {
@@ -31,20 +24,24 @@ function readIfSmall(filePath) {
 }
 
 run((payload) => {
-  const filePath = targetOf(payload.tool_input);
-  if (!filePath) return null;
+  const targets = targetsOf(payload);
+  if (payload.tool_name === "apply_patch" && targets.length === 0) {
+    return preToolUse({ permissionDecision: "deny", permissionDecisionReason: "Cannot inspect this patch's file paths. Supply a standard apply_patch payload." });
+  }
+  const decisions = targets.map((filePath) => {
 
-  // Match on the path as written (patterns are suffix-based) but hit the disk on the
-  // resolved one, so a relative file_path still works if cwd ever diverges.
-  const resolved = path.resolve(payload.cwd || process.cwd(), filePath);
-  const exists = fs.existsSync(resolved);
-
-  const decision = decideWrite({
-    filePath,
-    exists,
-    content: exists ? readIfSmall(resolved) : null,
-    config: loadConfig().guards,
-  });
-
+    const resolved = path.resolve(payload.cwd || process.cwd(), filePath);
+    const exists = fs.existsSync(resolved);
+    const decision = decideWrite({
+      filePath: resolved,
+      exists,
+      content: exists && /(^|\/)docs-vault\/specs\//.test(resolved) ? readIfSmall(resolved) : null,
+      config: payload.tool_name === "Read"
+        ? { ...loadConfig().guards, adrAppendOnly: false, implementedSpecs: false }
+        : loadConfig().guards,
+    });
+    return decision;
+  }).filter(Boolean);
+  const decision = decisions.find((item) => item.permissionDecision === "deny") || decisions[0];
   return decision ? preToolUse(decision) : null;
 });

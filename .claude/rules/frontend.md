@@ -10,12 +10,13 @@ paths:
 
 Applies when working on user-facing components. Loads only for these paths.
 
-- Component files own one component. Extract a second one to its own file rather than
-  growing a module of siblings.
-- Props in, events out. A component that reaches for global state to do its job is usually
-  a container that has been mixed into a presentational piece — split it.
-- Fetching and formatting live outside the component: data access in the API client,
-  formatting in `lib/`. Components render.
+- Keep components cohesive. Small private helpers can stay beside their only consumer;
+  extract when reuse or readability warrants it.
+- Follow existing state boundaries. Split components when reuse or complexity warrants it;
+  accessing global state alone does not require a refactor.
+- Follow the active framework's data-loading model. Client views delegate reusable data
+  access to hooks/clients; server components may fetch where their stack pack recommends it.
+  Keep independently testable domain logic outside rendering.
 - Reuse before creating: check the shared component directory, then the "Shared building
   blocks" map in `docs-vault/architecture.md`. A near-duplicate with one prop different is
   a prop, not a new component.

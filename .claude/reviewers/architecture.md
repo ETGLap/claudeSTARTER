@@ -7,8 +7,8 @@ greenfield → there is nothing to reuse yet, so the question is placement, not 
 take the starting structure from `.claude/reference/architectures.md` (`/start` does this).
 
 - [ ] Searched existing code for an equivalent (logic · UI · UX · structure).
-- [ ] Decision recorded with reasoning: reuse · extend · promote-to-shared · justified-new.
+- [ ] Record reasoning only for material architectural choices.
 - [ ] Shared-worthy code placed in the shared lib, not feature-local.
 - [ ] Follows existing architecture, design system, and naming; no new duplicate of an
       existing pattern or component.
-- [ ] Promoting existing code to shared is a refactor — explicit request only.
+- [ ] Extract shared code when required by the authorized change; keep unrelated refactors out.

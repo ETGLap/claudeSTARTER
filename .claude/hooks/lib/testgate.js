@@ -13,14 +13,12 @@
 const crypto = require("node:crypto");
 
 /**
- * A cheap fingerprint of the working tree: HEAD plus the porcelain status. Together they
- * move on a commit, a staged change, an unstaged edit, or a new untracked file — every way
- * a test result can change. Returns null when git state is unavailable, which callers must
- * treat as "run".
+ * Combine Git metadata, file-content digests and the command. External/ignored inputs
+ * are deliberately outside this cache contract; caching is opt-in for that reason.
  */
-function treeSignature(head, status) {
-  if (typeof head !== "string" || typeof status !== "string") return null;
-  return crypto.createHash("sha1").update(`${head}\n${status}`).digest("hex");
+function treeSignature(head, status, files, command) {
+  if (typeof head !== "string" || typeof status !== "string" || !Array.isArray(files) || typeof command !== "string") return null;
+  return crypto.createHash("sha256").update(JSON.stringify([head, status, files, command])).digest("hex");
 }
 
 /**
@@ -32,7 +30,7 @@ function treeSignature(head, status) {
 function shouldRunTests({ signature, last } = {}) {
   if (!signature) return true; // unknown state => run
   if (!last || typeof last !== "object") return true; // no prior run => run
-  if (!last.green) return true; // still red => keep blocking
+  if (last.green !== true) return true; // still red => keep blocking
   return last.signature !== signature;
 }
 

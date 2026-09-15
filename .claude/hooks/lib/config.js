@@ -12,10 +12,10 @@ const CONFIG_PATH = path.join(__dirname, "..", "..", "conductor.config.json");
 
 // Defaults encode the shipping policy: guards on (they only ever ask, except for secret
 // material), notifications off (opt-in — they are a personal preference, not a quality
-// gate), test gate on but inert until a command is set.
+// gate). Test blocking and per-edit formatting also require explicit opt-in.
 const DEFAULTS = Object.freeze({
-  testGate: { enabled: true, command: "", maxBlocks: 2 },
-  format: { enabled: true, command: "" },
+  testGate: { enabled: false, command: "", maxBlocks: 2, cache: false, timeoutMs: 300000 },
+  format: { enabled: false, command: "" },
   guards: {
     adrAppendOnly: true,
     implementedSpecs: true,
@@ -29,7 +29,7 @@ const DEFAULTS = Object.freeze({
     sound: true,
     events: { stop: true, notification: true },
     includeProjectName: true,
-    messages: { stop: "✅ Task complete", notification: null },
+    messages: { stop: "Turn stopped", notification: null },
   },
   injectContext: true,
 });
@@ -67,4 +67,35 @@ function loadConfig() {
   }
 }
 
-module.exports = { DEFAULTS, mergeConfig, loadConfig, CONFIG_PATH };
+// Hook entry points surface this separately; defaults keep guards available on bad input.
+function configWarning() {
+  try {
+    const user = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
+    if (!isPlainObject(user)) throw new Error();
+    for (const section of ["testGate", "format", "guards", "notify"]) {
+      if (user[section] !== undefined && !isPlainObject(user[section])) throw new Error();
+    }
+    const validate = (value, defaults) => {
+      for (const [key, candidate] of Object.entries(value)) {
+        if (!(key in defaults)) continue;
+        const expected = defaults[key];
+        if (isPlainObject(expected)) {
+          if (!isPlainObject(candidate)) throw new Error();
+          validate(candidate, expected);
+        } else if (expected !== null && typeof candidate !== typeof expected) throw new Error();
+        else if (expected === null && candidate !== null && typeof candidate !== "string") throw new Error();
+      }
+    };
+    validate(user, DEFAULTS);
+    if (user.testGate?.maxBlocks !== undefined && (!Number.isInteger(user.testGate.maxBlocks) || user.testGate.maxBlocks < 0)) throw new Error();
+    if (user.testGate?.timeoutMs !== undefined && (!Number.isInteger(user.testGate.timeoutMs) || user.testGate.timeoutMs < 1 || user.testGate.timeoutMs > 600000)) throw new Error();
+    for (const section of ["testGate", "format"]) {
+      if (user[section]?.command !== undefined && typeof user[section].command !== "string") throw new Error();
+    }
+    return null;
+  } catch {
+    return "Conductor configuration is missing or invalid. Check .claude/conductor.config.json; verification is not established.";
+  }
+}
+
+module.exports = { DEFAULTS, mergeConfig, loadConfig, configWarning, CONFIG_PATH };

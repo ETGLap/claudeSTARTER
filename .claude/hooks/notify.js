@@ -26,8 +26,8 @@ function buildMessage(event, payload, notifyConfig) {
   let title;
   let body;
   if (event === "stop") {
-    title = custom || "✅ Task complete";
-    body = "Claude Code finished.";
+    title = custom || "Turn stopped";
+    body = "The assistant stopped this turn. Check its verification report.";
   } else {
     // notification: needs response / approval / clarification / blocked
     title = "Claude Code";

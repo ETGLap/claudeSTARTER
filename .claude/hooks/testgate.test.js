@@ -39,12 +39,18 @@ test("shouldRunTests: runs when the signature is unavailable", () => {
 });
 
 test("treeSignature: stable for identical input, different when the tree moves", () => {
-  const a = treeSignature("deadbeef", " M src/app.js\n");
-  assert.strictEqual(a, treeSignature("deadbeef", " M src/app.js\n"));
-  assert.notStrictEqual(a, treeSignature("deadbeef", " M src/other.js\n"));
-  assert.notStrictEqual(a, treeSignature("cafebabe", " M src/app.js\n"));
+  const a = treeSignature("deadbeef", " M src/app.js\n", [["src/app.js", "digest"]], "node test.js");
+  assert.strictEqual(a, treeSignature("deadbeef", " M src/app.js\n", [["src/app.js", "digest"]], "node test.js"));
+  assert.notStrictEqual(a, treeSignature("deadbeef", " M src/other.js\n", [["src/app.js", "digest"]], "node test.js"));
+  assert.notStrictEqual(a, treeSignature("cafebabe", " M src/app.js\n", [["src/app.js", "digest"]], "node test.js"));
 });
 
 test("treeSignature: null when git state is unavailable", () => {
   assert.strictEqual(treeSignature(null, null), null);
+});
+
+test("malformed green values never reuse cached verification", () => {
+  for (const green of ["false", 1, {}, []]) {
+    assert.equal(shouldRunTests({ signature: "x", last: { signature: "x", green } }), true);
+  }
 });

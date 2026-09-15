@@ -1,240 +1,160 @@
 # Conductor
 
-A quality system for [Claude Code](https://claude.com/claude-code). Drop it into any
-repository and every build or change Claude makes runs through a TDD-centered pipeline
-with reuse, quality, security, and architecture gates — automatically, no command needed.
+Version: see [VERSION](VERSION). Portable engineering instructions and Node hooks for Claude
+Code, with optional Codex adapters. Zero runtime package dependencies. Requires Node 22+
+on PATH; hooks do not assume the assistant's own bundled runtime is exposed as `node`.
+Hook commands are tested on macOS/Linux shells. Windows shell command portability is not
+verified; notification code has a best-effort Windows implementation.
 
-This file is the kit's manual for humans and travels with the `.claude/` folder; the
-host project's root `README.md` stays its own.
+## Install
 
-Conductor scaffolds **once**, at project genesis (`/start`), and never again — after that
-it shapes *how* Claude works in your codebase. There are no feature/CRUD/component
-generators. It adds zero runtime dependencies: markdown instructions, five workflow skills,
-path-scoped rules, read-only specialist agents, and seven tiny zero-dependency Node hooks.
+1. Copy this `.claude/` directory into the target project, excluding `.state/` and
+   `settings.local.json`. Merge existing settings and custom extensions; do not blindly
+   overwrite the host's files. Templates are starting material, not project facts.
+2. Empty project: `/start <idea>` establishes a toolchain, test runner, stack decision and
+   project instructions. Existing code: `/maintain project` adopts the workflow.
+3. Record the real test and formatter commands in project context. Run them explicitly
+   during implementation. Automatic testing/formatting is disabled and unregistered by default.
+4. Run the configured checks, inspect their output, and inspect the assistant's hook
+   diagnostics. Host trust/permission settings control whether hooks actually execute.
 
-## The spectrum map
+## Workflows
 
-Claude Code offers four primitives, and they are not interchangeable. Conductor places
-every instruction in exactly one, chosen by what the instruction needs:
-
-| Need | Primitive | Where | Why |
-| --- | --- | --- | --- |
-| Judgment, conventions, context | `CLAUDE.md` | `.claude/CLAUDE.md` + imported gates | Always in context; followed most of the time. Right for "prefer the smallest change", wrong for "always format". |
-| Conventions for one layer or file type | **Rule** | `.claude/rules/` | `paths:` frontmatter loads it only when Claude touches a matching file. Ships with the kit, so it works before the directory exists. |
-| Must happen every time | **Hook** | `.claude/hooks/` | Executes on every matching event regardless of what the model decides. |
-| Scoped, occasional instructions | **Skill** | `.claude/skills/` | Description is cheap and always visible; the body costs nothing until relevant. |
-| Isolated exploration | **Subagent** | `.claude/agents/` | Own context window, own tool limits; returns a brief instead of flooding the session. |
-
-The rule the kit follows: **a "never" or "always" written as prose is a bug.** If it must
-hold every time, it belongs in `hooks/`. `/maintain` re-checks this mapping.
-
-This is also why enforcement is split by what can be trusted:
-
-- *Semantic* judgments (is this minimal? secure? a duplicate?) stay **advisory** — gates
-  the model applies.
-- *Deterministic* checks are **real hooks** — the test gate reads your test command's exit
-  code, the write guard reads a path, and neither asks the model's opinion.
-
-## How it works
-
-**One automatic pipeline**, defined in `.claude/CLAUDE.md`:
-
-1. **Context** — kit manual + always-loaded gates · project context · in-scope
-   `.claude/rules/` · nearest local `CLAUDE.md`
-2. **Plan** — spec first if the change is feature-sized (`/sdd`, then `/clear` and build via
-   `/implement` in a fresh session) · analyze the requirement · run existing tests (green
-   baseline) · reuse-first discovery · plan tests · write and commit the failing test (Red)
-3. **Code** — smallest change that passes (Green)
-4. **Review** — refactor the change just made · quality · security · placement ·
-   scope-gated lenses (performance · accessibility · compatibility · documentation) ·
-   re-run tests
-5. **Finish** — final gate · propose `/docs` if behavior changed · flag stale context
-6. **Report** — changed · tested · not verified · risks
-
-**Gates** (`.claude/reviewers/` + `.claude/policy/delegation.md`) are `@`-imported by the kit
-manual, so they are genuinely in context every session rather than a path the model might
-read: requirements, architecture (reuse before create), TDD, quality (which absorbs
-refactoring and the final gate), security, spec. The kit's own agents load `CLAUDE.md`, so they inherit these too — but the
-built-in `Explore` and `Plan` agents deliberately skip it, which is why
-[`policy/delegation.md`](policy/delegation.md) routes gated work to the named specialists.
-
-**Scope-gated lenses** are skills instead, because they only sometimes apply.
-`review-accessibility-web` and `-native` declare `paths:` globs so the harness activates
-the right one for the platform; `review-performance`, `review-compatibility` and `review-documentation` trigger from
-their descriptions.
-
-**Agents** (`.claude/agents/`) are read-only specialists Claude delegates discovery and
-audits to — discovery (reuse + existing behavior), stack-advisor (greenfield stack options), and security/performance/accessibility/docs/test auditors. Each returns a concise brief
-(findings · paths · risks · recommendation) and never implements; code changes — including
-writing the tests themselves — stay in the main session so Red→Green stays coupled.
-
-**Hooks** (`.claude/hooks/`) make the non-negotiables real — see
-[`hooks/README.md`](hooks/README.md).
-
-## Quick start
-
-### New project
-
-1. Copy the `.claude/` folder into your repo root — that's the whole kit.
-2. Start Claude Code and describe what you want built:
-
-   ```text
-   /start a dashboard for tracking elevator inspections
-   ```
-
-   Genesis classifies the project, separates what you asked for from what it
-   professionally requires, recommends a stack and records it as an ADR, scaffolds the
-   toolchain, and sets `testGate.command` — stopping when that exits 0. Then it hands off
-   to `/sdd` and never scaffolds again.
-3. *(Optional)* Desktop notifications — set `notify.enabled: true` in
-   `.claude/conductor.config.json`.
-
-### Existing project
-
-Do the steps above, then run `/maintain project`: its first run is a deliberate, gated
-retrofit — map → establish context and docs → repo-wide read-only audit → prioritized
-plan → apply on approval in small, behavior-preserving, test-gated steps. Re-run it
-periodically to keep the architecture and structure healthy as the project grows.
-
-## Layout
-
-```text
-CLAUDE.md                     Project-owned: philosophy · conventions · domain rules
-                              (generated from templates/claude-root.md; imports the kit)
-.claude/
-├── CLAUDE.md                 Kit manual: rules + the canonical 6-step pipeline + @imports
-├── README.md                 This file — the kit's manual for humans
-├── conductor.config.json     One config for every hook
-├── settings.json             Hook wiring + permissions.deny for secret files
-├── hooks/                    Deterministic layer (see hooks/README.md)
-│   ├── lib/                  Pure decision logic — guards · config · context · git ·
-│   │                         spec-state · io
-│   ├── context-inject.js     UserPromptSubmit — live session state
-│   ├── guard-writes.js       PreToolUse — ADRs, implemented specs, secret files
-│   ├── guard-bash.js         PreToolUse — force push, commit on main, rm -rf
-│   ├── format.js             PostToolUse — run the project formatter
-│   ├── spec-session.js       PostToolUse — records who authored each spec
-│   ├── test-gate.js          Stop — blocks "done" while tests are red
-│   ├── notify.js             Stop/Notification — desktop notifier (opt-in)
-│   └── *.test.js             node --test, zero dependencies
-├── reviewers/                Always-on gates, @imported by the kit manual
-│   ├── architecture.md       Reuse before create; placement and consistency
-│   ├── tdd.md                Red → Green → Refactor; green baseline first
-│   ├── quality.md            Smallest, cleanest change + refactoring + the final gate
-│   ├── security.md           Proportional to risk
-│   ├── requirements.md       Explicit vs inferred vs optional
-│   └── spec.md               Six elements; behavior not implementation
-├── rules/                    Path-scoped conventions — load only in scope
-│   ├── frontend.md           components · props in, events out · states
-│   ├── backend.md            thin handlers · validate at the boundary · authz
-│   ├── database.md           append-only migrations · constraints in the DB
-│   ├── mobile.md             shared by default · native a11y · manual device checks
-│   └── tests.md              one behavior per test · expected values from the spec
-├── skills/                   On-demand layer
-│   ├── start · sdd · implement · debug · docs · maintain   The six workflows
-│   └── review-performance · review-accessibility-web · review-accessibility-native ·
-│       review-documentation                     Scope-gated lenses
-├── agents/                   Read-only specialists: discovery + audits, never implement
-├── policy/
-│   └── delegation.md         Exploration → read-only subagents; implementation → main session
-├── context/
-│   └── project-context.md    Stable project facts (stack, commands, risks)
-└── templates/                spec.md + claude-root.md + docs/ skeletons + stacks/ packs
-```
-
-## Skills
-
-| Skill | What it does |
+| Task | Workflow |
 | --- | --- |
-| `/start <what to build>` | Project genesis for an empty repo: classify → triage explicit/inferred/optional requirements → decide the stack (written as ADR 0001) → scaffold the toolchain → wire `testGate.command` → generate root `CLAUDE.md` + context → hand off to `/sdd`. The only time the kit scaffolds. |
-| `/sdd <idea>` | Idea → read-only discovery → interactive interview → six-element spec (outcomes · scope · constraints · prior decisions · tasks · verification) in `docs-vault/specs/`. |
-| `/implement [spec]` | Build an approved spec through the TDD pipeline — verification criteria become the failing tests. No arg: pick from the approved-spec list. |
-| `/debug <symptom>` | Reproduce → isolate → hypothesize → capture the bug in a failing test → fix the cause. Stops and asks if it cannot reproduce. |
-| `/docs` | Audit docs against code, then update `docs-vault/` (Obsidian-style, wiki-linked) from the templates. Proposes before writing; ADRs are append-only. |
-| `/maintain` | Trim the `.claude/` system and refresh `project-context.md`. `/maintain project`: recurring gated audit of architecture, structure, reuse, and scalability — its first run retrofits an existing codebase. |
-| `review-*` | Four scope-gated lenses. Loaded automatically when in scope; also invocable by name. |
+| Small fix, docs, local behavior-preserving change | Focused plan and verification; no forced spec, delegation, or commit |
+| Substantial feature, endpoint, UI flow, schema/infra change | `/sdd` defines six elements; `/implement` builds and verifies the approved behavior |
+| Bug with unknown cause | `/debug`: reproduce, isolate, failing regression, fix, verify |
+| High-risk work | Add risk/rollback criteria and independent specialist review to the applicable workflow |
+| Documentation | `/docs` updates affected knowledge under the implementation's authorization |
+| Kit or project upkeep | `/maintain` or `/maintain project` |
 
-Because these are skills rather than legacy `commands/` files, Claude can reach for them on
-its own when a request matches the description — you do not have to type the slash command.
+A six-element spec contains outcomes, scope, constraints, prior decisions, tasks and
+verification. Existing approval to implement an agreed proposal counts; questions resolve
+material gaps rather than repeating an interview. Fresh sessions are useful for high-risk
+handoffs but optional. Commits follow user/project authorization, not skill invocation alone.
 
-Everything else — reuse checks, TDD, refactoring the change just made, security review,
-docs proposals — happens automatically inside the pipeline.
+## Where knowledge lives
 
-## Stack packs
+- `CLAUDE.md`: concise core principles and workflow routing, loaded with the root import.
+- Root project `CLAUDE.md`: project-owned constraints; preserve it during upgrades.
+- `context/project-context.md`: stable host facts; fill during adoption and keep current.
+- `rules/`: path-specific conventions. Applicable stack guidance refines generic defaults.
+- `skills/`: six workflows, loaded on demand.
+- `reviewers/`: optional references for relevant risks; no separate review-skill listing.
+- `agents/`: discovery only. Specialist definitions live in `templates/agents/`; copy only
+  those needed into `agents/`. Tests/code stay in the main session unless requested otherwise.
+- `templates/`: specs, project instructions, document skeletons and optional stack packs.
+  Enable a stack by copying its pack into `.claude/skills/<stack>/SKILL.md`.
+- `hooks/`: checks for supported tool events; [coverage and limits](hooks/README.md).
+- Host `docs-vault/`: living knowledge, shared-building-block map, specs and append-only ADRs.
 
-Optional stack-specific *knowledge* (never generators) lives in `.claude/templates/stacks/`.
-Enable one by copying it into skills, e.g.:
+`.env.example` is a public template: variable names and empty/obviously fake values only.
+Real env files and key material remain protected on supported direct read/write operations.
+This path convention is not a content-based secret scanner.
 
-```sh
-mkdir -p .claude/skills/htmx && cp .claude/templates/stacks/htmx.md .claude/skills/htmx/SKILL.md
+## Optional automation
+
+The default wiring registers only startup guidance and safety guards. It has no prompt scan,
+per-edit formatter, Stop test runner or notifier. For a requested automation:
+
+1. Merge only its hook entry from `templates/hooks.optional.json` into `settings.json`,
+   preserving existing groups. Do not copy every optional entry.
+2. Enable its config section and set the real command when required. The example below
+   illustrates opting into testing and formatting; it is not the shipping default.
+3. Restart the host and verify the chosen hook. Remove its registration to avoid process
+   launches when disabling it again.
+
+Config alone does not register a hook. Normal workflow verification remains required even
+when all optional automation is disabled.
+
+```json
+{
+  "testGate": {
+    "enabled": true,
+    "command": "npm test",
+    "maxBlocks": 2,
+    "cache": false,
+    "timeoutMs": 300000
+  },
+  "format": { "enabled": true, "command": "npx --no-install prettier --write" },
+  "notify": { "enabled": false },
+  "injectContext": true
+}
 ```
 
-Disable by deleting the skill directory. Packs inform specs, reviews, and implementation;
-nothing scaffolds code outside spec→test→implement. `htmx` ships as the example.
+Use a formatter already installed by the project. Commands run at the kit's project root;
+write targets resolve against the tool payload's working directory. Caching is off by
+default. Enable it only for suites determined by tracked/non-ignored files and the command.
+Ignored inputs, environment changes, dependencies, clocks and external services are outside
+that cache contract. The gate hashes file contents and verifies the snapshot stayed stable
+during the run; unsupported/large trees rerun the suite. It is not a universal test oracle.
 
-## Extending
+After `maxBlocks` failed continuation attempts, the gate returns control with an explicit
+verification-failed message. It does not mark the task verified. Format/configuration errors
+are also reported. Notifications are opt-in and report a stopped turn, not verified success.
 
-Pick the primitive by what the addition needs, not by which file is easiest to edit:
+## Codex
 
-- **A judgment or convention** → a gate in `.claude/reviewers/` (a principle line +
-  `- [ ]` gates), then `@`-import it from `.claude/CLAUDE.md`.
-- **Something that must happen every time** → a hook. Decision logic goes in
-  `hooks/lib/` as a pure function with a test; the entry point only does I/O. Clone the
-  contract: zero-dep, never throw, always exit 0.
-- **Scoped or occasional instructions** → a skill in `.claude/skills/<name>/SKILL.md`.
-  Write the `description` for the model, not for yourself — it decides activation. Add
-  `paths:` when the scope is reliably a file type; leave it off when it isn't, because
-  `paths` *restricts* activation and a glob that misses your layout silently disables it.
-- **Exploration or an audit** → an agent in `.claude/agents/` (`tools: Read, Glob, Grep` —
-  read-only, always), body: mission + brief contract. Use `skills:` to preload its lens.
-- **Scaling rule** — add only on repeated need: reusable, prevents future mistakes, worth
-  the tokens. The instruction set is deliberately small; run `/maintain` to keep it that way.
+Install `.claude/`, the optional `.codex/` adapters and `.agents/skills/` together. The root
+AGENTS.md in the starter describes this development repository: **do not copy it into a
+host project**. Merge [templates/agents-root.md](templates/agents-root.md) into the host's
+AGENTS.md instead. Codex needs explicit guidance to read the shared core and applicable
+rules; it does not rely on Claude's @import or path-rule loading.
 
-## What runs whether you ask or not
+- Hook commands resolve through the Git root; initialize a Git repository first. Existing
+  hook trust/settings remain in control; this kit does not disable permission checks.
+- `.codex/hooks/` forwards to the canonical implementation and configuration in `.claude/`.
+- Bash and standard `apply_patch` payloads are supported, including multiple files, deletes
+  and moves. Hook checks also recognize direct `Read`/`Write`/`Edit` payloads when supplied.
+- Codex currently does not support a PreToolUse `ask` response. The adapter turns a guarded
+  ask into a deny with an explanation. Review and run an approved operation manually, or
+  explicitly configure its guard; the adapter cannot open a confirmation prompt.
+- Codex agents have a read-only sandbox and inherit the configured model. Claude-specific
+  model aliases and preloaded-skill fields are not copied into Codex TOML.
+- Optional hook entries are in `.codex/hooks.optional.json`; merge only the chosen entries
+  into `.codex/hooks.json` and enable their shared config. No Notification event is supported.
+- Optional specialist TOML files are in `.codex/agents.optional/`; copy selected files into
+  `.codex/agents/`. Keep unused templates outside the active agent directory.
+- Restart a session after changing skills/agents/hooks and verify the hooks were loaded.
 
-Hooks, so they execute every time their condition is met — no reliance on Claude
-remembering:
+The adapter targets the [documented hook contract](https://learn.chatgpt.com/docs/hooks)
+and [custom-agent format](https://learn.chatgpt.com/docs/agent-configuration/subagents),
+reviewed on 2026-09-15. Automated subprocess tests verify payload/output behavior; an actual
+interactive Claude/Codex session must still verify installation and trust on each host.
 
-| When | What happens |
-| --- | --- |
-| Session start | Says once whether the project is bootstrapped and whether a test command is configured |
-| Every turn | Branch, specs awaiting `/implement`, and a warning if a spec was written in this session |
-| Before a file write | ADRs stay append-only · implemented specs must be superseded · secret files (`.env`, `*.pem`, `*.key`, `id_rsa*`) are blocked |
-| Before a shell command | Force pushes, commits on `main`/`master`, and recursive force deletes ask first |
-| After a file write | Your formatter runs on the file |
-| When Claude says "done" | Blocked while your test suite is red — skipped when nothing changed since the last green run. Inert until `testGate.command` is set, so it never reports green on a suite that is not yours. |
+## Upgrade
 
-Guards ask rather than block, so you stay the authority. Tune or disable any of them in
-`.claude/conductor.config.json`.
+1. Record the installed VERSION and save a reviewed working-tree checkpoint.
+2. Compare the new kit against the installed one. Preserve host config, root instructions,
+   project context, local settings and custom rules/skills/agents. Do not copy `.state/`.
+3. Merge changed kit-owned files; review removed/renamed files manually. This kit has no
+   destructive updater. Version changes do not automatically replace host customizations.
+4. If using Codex, install the matching generated adapters alongside the canonical files.
+5. Validate JSON, run `node --test .claude/hooks/*.test.js`, then run the host's actual test
+   and formatter commands. Check hook startup and one harmless protected-operation preview.
 
-## Worked example
+### Changes in 0.3.0
 
-```text
-you   /sdd users should be able to export the inspection table as CSV
-      … discovery surveys existing export code, Claude interviews you element by element …
-      → docs-vault/specs/0007-csv-export.md   Status: approved
+Lean defaults: startup and guards only; testing, formatting and notifications are opt-in.
+Spec authorship tracking and per-prompt context injection were removed. Review lenses moved
+from skills into references; six specialist agents moved into optional templates.
 
-you   git commit -m "docs: spec for CSV export"
-you   /clear
+On upgrade, remove old `UserPromptSubmit` context-inject and `PostToolUse` spec-session
+registrations, including local settings. Remove duplicate local Stop test hooks. Review
+existing formatter/test/notifier registrations explicitly; copying a disabled config alone
+still leaves hook processes launching. Remove obsolete generated library/test wrappers and
+old review-skill/agent copies only after preserving project customizations.
 
-you   /implement 0007-csv-export
-      → baseline green (24 tests)
-      → Red: 3 failing tests from the spec's verification criteria
-             commit "test: CSV export includes all visible columns (red)"
-      → Green: implemented, 27 tests pass
-             commit "feat: CSV export for the inspection table"
-      → reviewed: quality · security · architecture · performance (large result sets)
-      → spec marked implemented
-      → report: changed · tested · not verified · risks
+### Changes in 0.2.0
 
-you   /docs
-```
+Content-aware optional test caching, isolated retry state, visible check failures, public
+example env files, quote-aware literal shell checks, shared Codex adapters, proportional
+workflows and shorter core context. Existing installs must opt in again to test caching.
 
-Bug fixes, spikes, refactors and docs-only changes **skip the spec** — say what you want in
-plain language, or use `/debug` when the cause is unknown. The pipeline still applies:
-reuse-check, a failing test first, review, and an honest report. Ceremony scales to risk.
+## Extend
 
-## Requirements
-
-The Claude Code CLI. Hooks and their tests run on the Node runtime that ships with it —
-nothing is installed into your project.
+Keep semantic judgment in concise guidance, occasional procedures in skills, and supported
+mechanical checks in hooks. New checks need a meaningful regression and a documented
+coverage boundary. Add agents and integrations for repeated, measured need. Smaller context
+and cheaper agents are hypotheses about cost until representative tasks establish savings.

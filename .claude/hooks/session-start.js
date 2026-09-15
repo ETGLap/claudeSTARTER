@@ -1,17 +1,15 @@
 #!/usr/bin/env node
 "use strict";
 
-// SessionStart hook: reports the facts that are fixed for a whole session — whether the
-// project is set up, and whether a test command is configured.
-//
-// These used to ride along on every prompt. They cannot change between turns, so saying
-// them once is the same information at a fraction of the tokens.
+// Startup guidance only; no per-prompt scans or session bookkeeping.
 
 const fs = require("node:fs");
 const path = require("node:path");
 const { run, additionalContext } = require("./lib/io.js");
-const { loadConfig } = require("./lib/config.js");
+const { loadConfig, configWarning } = require("./lib/config.js");
 const { buildSessionStart } = require("./lib/context.js");
+
+const { PROJECT_ROOT } = require("./lib/state");
 
 const PROJECT_CONTEXT = path.join(__dirname, "..", "context", "project-context.md");
 
@@ -50,15 +48,15 @@ function needsBootstrap(cwd) {
   }
 }
 
-run((payload) => {
+run(() => {
   const config = loadConfig();
   if (config.injectContext === false) return null;
 
-  const cwd = payload.cwd || process.cwd();
-  const text = buildSessionStart({
+  const cwd = PROJECT_ROOT;
+  const bootstrap = buildSessionStart({
     needsBootstrap: needsBootstrap(cwd),
-    testGate: config.testGate,
   });
 
+  const text = [configWarning(), bootstrap].filter(Boolean).join("\n");
   return text ? additionalContext("SessionStart", text) : null;
 });

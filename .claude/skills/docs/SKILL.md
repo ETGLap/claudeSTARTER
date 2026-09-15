@@ -1,22 +1,19 @@
 ---
 name: docs
-description: Audit docs-vault/ against the current code, then propose and apply updates from the kit's doc templates. Use when behavior, interfaces, commands, or schema changed, or when the user asks to update or check the documentation.
-when_to_use: After a behavior-changing merge, or on request. Trigger phrases: "update the docs", "document this", "are the docs stale", "write an ADR".
+description: Audit and update affected docs-vault pages alongside code changes, preserving human intent and append-only decisions.
 argument-hint: [area]
 ---
 
 # /docs
 
-Audit docs against current code, then update `docs-vault/` (Obsidian-style; flat, wiki-links)
-from `.claude/templates/docs/`.
-
-- Audit first: find outdated, missing, or inconsistent docs (api, db, setup, architecture).
-  Delegate the sweep to the `docs-auditor` agent.
-- Scan recent changes and the code to find what needs documenting. The `docs-auditor` is
-  read-only (Read/Glob/Grep) and cannot run git — gather `git diff` and recent commits in
-  the main session and pass the summary into the agent's prompt.
-- Propose the diffs; write only after confirmation.
-- Never overwrite human-written prose without asking. ADRs (`decisions/`) are append-only —
-  a hook will ask before any edit to an existing one; supersede instead.
-- Link, don't duplicate. Keep concrete: real names, IDs, env var names (never secrets).
-- Keep `architecture.md` "Shared building blocks" (the reuse map) current.
+- Identify affected pages from the change. Use docs-auditor for a broad drift survey;
+  pass the relevant diff summary because that read-only agent cannot run Git.
+- Update documentation required by the authorized change without a second approval.
+  Preserve unrelated human prose and its intent. Ask before changing scope or replacing
+  a human-authored document wholesale, unless already authorized.
+- Keep the vault flat and wiki-linked. Record concrete interfaces, commands and decisions;
+  use names of environment variables, never secret values.
+- Create pages only as needed from `.claude/templates/docs/`. Maintain the vault index,
+  architecture's shared-building-block map, spec status and project context when affected.
+- ADRs are append-only: add a superseding decision rather than rewriting an accepted one.
+- Report substantive documentation changes with the implementation.

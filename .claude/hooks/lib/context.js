@@ -1,55 +1,8 @@
 "use strict";
 
-// Builds the text the context hooks inject, split by how often the fact can change.
-//
-// Deliberately NOT a paraphrase of CLAUDE.md: that file is already in context every turn,
-// so repeating it buys nothing and costs tokens on every turn forever. These report *state*
-// CLAUDE.md cannot know.
-//
-// The split matters. Whether the project is bootstrapped, and whether a test command is
-// configured, are fixed for a whole session — they belong in SessionStart. Only the branch,
-// the pending specs, and the same-session warning can change between prompts.
-
-/** Compose the per-turn text. Returns null when there is nothing worth saying. */
-function buildContext(state = {}) {
-  const { branch, defaultBranch, approvedSpecs } = state;
-  const sameSessionSpecs = Array.isArray(state.sameSessionSpecs) ? state.sameSessionSpecs : [];
-  const lines = [];
-
-  if (branch) {
-    lines.push(
-      branch === defaultBranch
-        ? `Branch: ${branch} — this is the default branch; branch before committing.`
-        : `Branch: ${branch}`
-    );
-  }
-
-  // A same-session spec gets the warning instead of the plain pending line — both would
-  // otherwise fire for the same slug, and only one of them is actionable.
-  const pending = (Array.isArray(approvedSpecs) ? approvedSpecs : []).filter(
-    (slug) => !sameSessionSpecs.includes(slug)
-  );
-  if (pending.length > 0) {
-    lines.push(`Approved specs awaiting /implement: ${pending.join(", ")}.`);
-  }
-
-  if (sameSessionSpecs.length > 0) {
-    const subject =
-      sameSessionSpecs.length === 1
-        ? `Spec ${sameSessionSpecs[0]} was written in this session.`
-        : `Specs ${sameSessionSpecs.join(", ")} were written in this session.`;
-    lines.push(
-      `⚠ ${subject} Commit it and /clear before /implement — implementing here reuses the ` +
-        `context that wrote it, so a spec with gaps would still appear to work.`
-    );
-  }
-
-  return lines.length > 0 ? lines.join("\n") : null;
-}
-
-/** Compose the once-per-session text. Returns null when the project is fully set up. */
+// Only bootstrap guidance is emitted automatically; task context is resolved on demand.
 function buildSessionStart(state = {}) {
-  const { needsBootstrap, testGate } = state;
+  const { needsBootstrap } = state;
   const lines = [];
 
   // Genesis and retrofit need opposite advice: `/maintain project` maps an existing
@@ -58,7 +11,7 @@ function buildSessionStart(state = {}) {
   if (needsBootstrap === "genesis") {
     lines.push(
       "This project has no application code yet — run `/start <what to build>` to " +
-        "classify it, decide a stack, and wire the test gate."
+        "classify it, decide a stack, and establish test commands."
     );
   } else if (needsBootstrap) {
     lines.push(
@@ -67,31 +20,9 @@ function buildSessionStart(state = {}) {
     );
   }
 
-  if (!testGate?.enabled || !testGate.command) {
-    lines.push(
-      "Test gate not armed (no test command configured) — you must run and read tests " +
-        "yourself before claiming anything passes."
-    );
-  }
 
   return lines.length > 0 ? lines.join("\n") : null;
 }
 
-/**
- * Pick approved spec slugs, newest first, capped.
- *
- * The cap must apply *after* the status filter: capping the scan first meant an approved
- * spec past the cap simply vanished from the injected context, and readdir order made which
- * ones vanished arbitrary. Sorting descending keeps the most recent specs visible.
- */
-function selectApproved(names, isApproved, cap) {
-  return [...names]
-    .filter((name) => name.endsWith(".md"))
-    .sort()
-    .reverse()
-    .filter((name) => isApproved(name))
-    .slice(0, cap)
-    .map((name) => name.replace(/\.md$/, ""));
-}
 
-module.exports = { buildContext, buildSessionStart, selectApproved };
+module.exports = { buildSessionStart };

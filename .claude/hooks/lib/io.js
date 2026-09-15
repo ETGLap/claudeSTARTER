@@ -13,7 +13,8 @@ function readStdin() {
     process.stdin.on("data", (chunk) => (data += chunk));
     process.stdin.on("end", () => {
       try {
-        resolve(JSON.parse(data));
+        const parsed = JSON.parse(data);
+        resolve(parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {});
       } catch {
         resolve({}); // payload schema varies across versions — degrade, never fail
       }

@@ -2,50 +2,28 @@
 
 # Conductor Starter
 
-> The development repo for the Conductor kit — the `.claude/` folder that gets copied into
-> other projects. What lives here is the kit itself, not an application.
+Development repository for the portable `.claude/` kit, not a host application.
+The optional Codex adapters share that canonical source. See `docs-vault/README.md`.
 
-## Philosophy
+## Project conventions
 
-- **Every rule lives in the primitive that can hold it.** Advisory judgment in `CLAUDE.md`,
-  guarantees in hooks, occasional instructions in skills, isolated exploration in
-  subagents. A "never" or "always" written as prose is a bug — it belongs in `hooks/`.
-- **The kit scaffolds once, at project genesis, and never again.** After `/start` establishes
-  a toolchain and a test runner, every subsequent change goes through spec → test →
-  implement. There are no feature/CRUD/component generators, ever.
-- **Enforcement follows trust.** Semantic judgments (is this minimal? secure? a duplicate?)
-  stay advisory. Deterministic checks (exit codes, file paths, session identity) become
-  hooks that do not ask the model's opinion.
+- Zero runtime dependencies: Node built-ins only. No host package.json or install step.
+- Keep hook decisions testable in `.claude/hooks/lib/`; entry points handle execution.
+  Hooks exit 0 and use supported JSON responses. Important failures must be visible.
+- Test with `node --test .claude/hooks/*.test.js`; use the explicit glob for the dot-directory.
+  Validate wiring and generated adapters with `node scripts/validate-kit.js`.
+- Shared implementation lives in `.claude/`; regenerate `.codex/` and `.agents/` adapters
+  with `node scripts/sync-adapters.js`. Do not independently edit generated files.
+- Conventional Commits when authorized. Do not commit directly to main or rewrite history
+  without approval. Keep edits limited to the requested work.
 
-## Conventions
+## Shipping boundaries
 
-- **Zero runtime dependencies, ever.** Hooks use only the Node runtime that ships with
-  Claude Code. No `package.json`, no installs into a host project.
-- **Hooks separate judgment from I/O.** All decision logic goes in `.claude/hooks/lib/` as
-  pure functions with tests; entry points only read stdin and write stdout. Every hook is
-  zero-dep, never throws, and always exits 0.
-- **Tests run with `node --test .claude/hooks/*.test.js`.** The explicit glob is required —
-  Node's test discovery skips dot-directories, so passing the bare directory finds nothing.
-- **Hook scripts are referenced as `${CLAUDE_PROJECT_DIR}/.claude/hooks/<name>.js`**, never
-  by relative path: hooks run in the session's cwd, which changes across `cd` and worktrees.
-- Conventional Commits. Never commit directly to `main`.
-
-## Domain rules
-
-- **`.claude/context/project-context.md` stays blank on purpose.** It is the template that
-  ships to host projects; filling it here would pollute every copy. This file is the
-  starter's own project layer instead.
-- **Anything under `.claude/` travels.** Before adding a file, ask whether every project
-  that copies the kit needs it. Add only on repeated need.
-- The root `README.md` documents the starter repo; `.claude/README.md` is the kit's manual
-  and travels with it. Keep the two from drifting into duplicates.
-
-## Risks & no-go zones
-
-- `.claude/settings.json` wires every hook — a syntax error there silently disables the
-  whole quality layer. Validate after editing.
-- The guards in `.claude/hooks/lib/guards.js` can block real work if their patterns get
-  greedy. Widen them only with a test that proves the new match, and prefer `ask` over
-  `deny`.
-- `.claude/.state/` is machine-local session bookkeeping. Never commit it, never read it as
-  project truth.
+- `.claude/context/project-context.md` stays blank: it is the host-project template.
+- Everything under `.claude/` travels; starter-only tools and evidence belong in root
+  `scripts/` and `docs-vault/`. No machine-local paths in distributed files.
+- Root README describes kit development; `.claude/README.md` explains host usage.
+- Validate hook settings after changes. Prefer narrow supported guards to broad regexes;
+  every widened pattern needs a positive regression and harmless negative examples.
+- `.claude/.state/` is disposable session bookkeeping, ignored by Git. Tests use isolated
+  copies and must not read, back up, or overwrite the live ledger.

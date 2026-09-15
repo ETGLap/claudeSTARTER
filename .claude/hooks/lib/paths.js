@@ -14,4 +14,13 @@ function resolveTarget(cwd, filePath) {
   return path.resolve(cwd || process.cwd(), filePath);
 }
 
-module.exports = { resolveTarget };
+function targetsOf(payload = {}) {
+  const input = payload.tool_input || {};
+  const direct = input.file_path || input.notebook_path;
+  if (typeof direct === "string") return [direct];
+  if (payload.tool_name !== "apply_patch" || typeof input.command !== "string") return [];
+  return [...new Set([...input.command.matchAll(/^\*\*\* (?:Add File|Update File|Delete File|Move to): (.+)\r?$/gm)]
+    .map((match) => match[1].trim()))];
+}
+
+module.exports = { resolveTarget, targetsOf };

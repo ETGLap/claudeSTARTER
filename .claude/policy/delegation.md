@@ -1,26 +1,21 @@
-# Policy: delegation
+# Delegation
 
-Keep the main context for decisions and implementation; offload exploration.
+Delegate a bounded question when independent expertise or a large search justifies a
+separate context. Keep small lookups and work dependent on current decisions local.
+Parallelize only independent questions; combine findings before deciding.
 
-Delegate to a read-only subagent when a step is information-gathering: locating code or
-usages, understanding an existing feature or architecture, finding reusable code, mapping
-dependencies, reviewing docs/tests/config, researching libraries or APIs. Independent
-questions → parallel subagents, one per aspect; combine their summaries before deciding.
+Discovery is the default agent for behavior, reuse, test and documentation reconnaissance.
+Optional specialists live in `.claude/templates/agents/`; install only those a project needs.
+For high-risk independent review, use an available specialist or a bounded review agent;
+if none is available, report the gap rather than silently claiming independent review.
+Implementation, including tests, stays in the main session unless the user requests otherwise.
 
-**Use the named specialists in `.claude/agents/`** (discovery, stack-advisor, security/performance/accessibility/docs/test auditors). They load the kit
-manual, so every gate above applies inside them; all are read-only and return the same
-brief format.
+Pass the objective, relevant paths, constraints, known findings, and expected brief.
+Reuse an available agent for follow-ups; do not have several agents repeat the same search.
+Request findings with evidence, file paths, risks and a recommendation; cap the brief to
+roughly 300 words unless the task needs more. Do not ask for exploration logs.
 
-The built-in `Explore` and `Plan` agents deliberately **skip `CLAUDE.md`** to stay fast, so
-they arrive with none of the gates — no reuse rule, no architecture gate, no project
-context. Use `Explore` only for cheap literal lookups ("where is X defined?") where no
-judgment is needed, and pass any rule it must apply explicitly in its prompt.
-
-Writing tests is implementation: the test-auditor maps the landscape, the main session
-writes the tests.
-
-Subagents return a concise brief — findings · file paths/symbols · risks ·
-recommendation — never the exploration log.
-
-Stay in the main session for: edits, new code, refactors, running implementation steps,
-and anything that depends on decisions already made this session.
+Claude custom agents normally inherit CLAUDE.md. Explore/Plan skip it; pass necessary
+constraints explicitly when using them for literal lookups. Do not assume other harnesses
+have the same inheritance rules. Keep model selection configurable; measure total task
+cost and correctness before introducing a cheaper model or another delegation step.

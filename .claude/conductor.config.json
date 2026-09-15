@@ -1,11 +1,13 @@
 {
   "testGate": {
-    "enabled": true,
+    "enabled": false,
     "command": "",
-    "maxBlocks": 2
+    "maxBlocks": 2,
+    "cache": false,
+    "timeoutMs": 300000
   },
   "format": {
-    "enabled": true,
+    "enabled": false,
     "command": ""
   },
   "guards": {
@@ -25,7 +27,7 @@
     },
     "includeProjectName": true,
     "messages": {
-      "stop": "\u2705 Task complete",
+      "stop": "Turn stopped",
       "notification": null
     }
   },

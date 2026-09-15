@@ -45,3 +45,12 @@ test("currentBranch: a non-repo directory yields null, never a throw", () => {
   assert.strictEqual(currentBranch(dir), null);
   fs.rmSync(dir, { recursive: true, force: true });
 });
+
+test("currentBranch: finds the owning repository from a nested cwd", (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "conductor-parent-"));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(dir, ".git"));
+  fs.writeFileSync(path.join(dir, ".git/HEAD"), "ref: refs/heads/main\n");
+  const sub = path.join(dir, "nested/src"); fs.mkdirSync(sub, { recursive: true });
+  assert.equal(currentBranch(sub), "main");
+});

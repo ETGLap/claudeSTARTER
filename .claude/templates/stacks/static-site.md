@@ -40,4 +40,4 @@ Informs the spec→test→implement pipeline; never scaffolds code on its own.
 
 Build success plus link checking is the automated tier, and it is usually enough.
 Accessibility and visual review are manual and documented. Do not unit-test static markup —
-`reviewers/tdd.md`'s "if tests are impossible, document manual verification" applies here.
+Document meaningful manual verification where automated tests add little value.

@@ -15,9 +15,8 @@ Smallest, cleanest change that fits the codebase.
 ## Refactoring
 
 Improve structure without changing behavior. In-pipeline refactoring — cleaning the code you
-just wrote while tests are green — is automatic and scoped to your own change. Touching
-pre-existing or unrelated code is a standalone refactor: explicit request only, never
-unprompted, and clarify goal and scope first.
+just wrote while tests are green — is automatic and scoped to your own change. Necessary edits to existing code follow the task authorization. Unrelated cleanup
+requires a separate request; clarify its goal and scope first.
 
 - [ ] Behavior preserved: the same tests pass before and after.
 - [ ] Scope contained: no feature, fix, or unrelated change smuggled in.
@@ -26,5 +25,6 @@ unprompted, and clarify goal and scope first.
 ## Before responding
 
 - [ ] Requirement satisfied — if a spec governed this change, its verification criteria pass.
-- [ ] Tests/lint/build run; results reported (green required before done).
+- [ ] Applicable tests/lint/build run; results reported. Unavailable or failed checks remain
+      explicit, and no incomplete verification is reported as passing.
 - [ ] Risks and anything not verified stated honestly.

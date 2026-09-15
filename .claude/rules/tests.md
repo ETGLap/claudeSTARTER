@@ -20,5 +20,5 @@ Applies when writing or changing tests.
 - Each test sets up and tears down its own state. Tests that must run in order are a defect.
 - Assert on behavior, not on log output or call counts, unless the call itself is the
   contract.
-- A red test is fixed in the implementation — never by weakening, deleting, or rewriting
-  the test to match what the code does.
+- Fix the implementation to meet independent expectations. Correct a mistaken test only
+  against requirements or another independent oracle; explain the evidence and preserve coverage.
