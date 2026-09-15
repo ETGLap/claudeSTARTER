@@ -1,13 +1,6 @@
 "use strict";
 
-// Pure decision logic for the PreToolUse guards.
-//
-// Why this file exists separately from the hooks: these rules were prose in CLAUDE.md
-// ("ADRs are append-only", "never push --force"), which is advisory. Encoding them as pure
-// functions makes them deterministic *and* testable without a live session — the hook
-// entry points do only I/O and delegate every judgment here.
-//
-// Each decider returns a PreToolUse decision object or null (= nothing to say).
+// Path guards and quote-aware literal shell checks; see hooks/README.md for coverage.
 
 const ADR = /(^|\/)docs-vault\/decisions\/[^/]+\.md$/i;
 const SPEC = /(^|\/)docs-vault\/specs\/[^/]+\.md$/i;
@@ -121,7 +114,6 @@ function hasFlag(flags, short, longs) {
 
 function decideBash({ command, branch = null, config = {} } = {}) {
   if (typeof command !== "string" || command === "") return null;
-  if (!on(config, "gitSafety")) return null; // legacy master switch for all three rules
 
   let uncertainBranch = false;
   for (const segment of segments(command)) {

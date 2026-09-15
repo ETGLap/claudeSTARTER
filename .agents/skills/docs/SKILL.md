@@ -8,8 +8,8 @@ argument-hint: [area]
 
 # /docs
 
-- Identify affected pages from the change. Use docs-auditor for a broad drift survey;
-  pass the relevant diff summary because that read-only agent cannot run Git.
+- Identify affected pages from the change. For a broad drift survey, use an installed
+  docs-auditor or discovery; pass the relevant diff summary because neither can run Git.
 - Update documentation required by the authorized change without a second approval.
   Preserve unrelated human prose and its intent. Ask before changing scope or replacing
   a human-authored document wholesale, unless already authorized.

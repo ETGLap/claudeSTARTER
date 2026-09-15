@@ -29,7 +29,8 @@ function summarize(source) {
   let previous = -1, text = '';
   for (const i of [...selected].sort((a,b) => a-b)) {
     if (i > previous+1) text += `[${i-previous-1} lines omitted]\n`;
-    text += `${i+1}: ${lines[i]}\n`; previous = i;
+    const line = lines[i].length > 80 ? lines[i].slice(0,80) + ' [line truncated]' : lines[i];
+    text += `${i+1}: ${line}\n`; previous = i;
   }
   if (previous < lines.length-1) text += `[${lines.length-previous-1} lines omitted]\n`;
   if (text.length > 7700) text = text.slice(0,7700) + '\n[excerpt truncated]\n';

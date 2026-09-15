@@ -1,47 +1,21 @@
-# OS files
+# Local development artifacts
 .DS_Store
 Thumbs.db
-Desktop.ini
-
-# iOS
-.DS_Store
 *.swp
 *.swo
 *~
-
-# Android
-.gradle/
-.idea/
-*.iml
-build/
-local.properties
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-*.Identifier
-
-# Node modules
-node_modules/
-package-lock.json
-npm-debug.log
-
-# IDE
 .vscode/
 .idea/
-*.sublime-workspace
-*.sublime-project
-
-# Environment
-.env
-.env.local
-config.env
-
-# Conductor session state (spec-authorship ledger — machine-local, never shared)
-.claude/.state/
-# Working notes for the starter audit (not part of the kit)
+node_modules/
+dist/
+build/
+coverage/
+*.log
 .tmp/
 
-# Starter-repo local gate wiring (not part of the kit)
+# Local secrets and settings; portable state exclusions live in .claude/.gitignore
+.env
+.env.*
+!.env.example
+config.env
 .claude/settings.local.json

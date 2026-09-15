@@ -1,80 +1,64 @@
 # Conductor
 
-Portable engineering workflow. Project-specific facts belong in the root `CLAUDE.md`
-and `.claude/context/project-context.md`; this kit scaffolds only at project genesis.
+Portable engineering workflow. Root project instructions and
+`.claude/context/project-context.md` hold project-specific facts. Scaffold only at genesis.
 
-## Working principles
+## Working rules
 
-- Deliver the requested behavior with the smallest maintainable change. Search for an
-  existing implementation before creating another. Keep unrelated code outside the change.
-- Follow the user's authorization and constraints. Ask a focused question when a missing
-  answer changes behavior, scope, safety or an expensive decision. Resolve routine reversible
-  details from evidence; state consequential assumptions. Do not repeat an answered question.
-- Project constraints and applicable stack guidance refine general kit defaults. If they
-  conflict on a material requirement, surface that conflict rather than silently choosing.
-- Test changed behavior from independently defined expectations: failing test, minimal fix,
-  then refactor while green. Use suitable manual checks where automation adds little value.
+- Deliver the requested behavior with the smallest maintainable change. Search for existing
+  code before adding it; introduce abstractions for concrete requirements or reuse.
+- Honor the user's authorization and constraints. Ask only when missing information changes
+  behavior, scope, safety or an expensive choice. Reuse prior answers; resolve routine details
+  from evidence. Surface material conflicts between project, stack and general guidance.
+- Test changed behavior against independent expectations: failing test → minimal fix →
+  refactor while green. Existing tests can protect behavior-preserving edits; use manual
+  checks where automation adds little value. Never weaken a test merely to pass.
 - Validate inputs and authorization at boundaries. Keep secrets out of source and output.
-  Destructive actions require the user's authorization; hooks cover only documented cases.
-- Update affected documentation in the same change. Preserve human intent and append new
-  ADRs to supersede decisions. Keep the project's stable context current.
-- Commit or push only when the user or project policy authorizes it. A red-test commit is
-  optional evidence, not a prerequisite for test-first work. Do not include others' changes.
-- Report what changed, what was verified, and remaining gaps. A failed or skipped check
-  is not a passing check; a hook returning control is not proof of completion.
+  Destructive actions require user authorization; hooks protect only documented operations.
+- Update affected documentation with the change. Keep stable project context current;
+  preserve human intent and supersede ADRs by adding new decisions.
+- Commit/push only under user or project authorization. Separate Red/Green commits are optional;
+  exclude others' changes. Report results, relevant verification, material decisions and gaps.
+  Failed/skipped checks or a hook returning control are not proof of success.
 
-Finish when the requested behavior is complete and applicable checks pass. Repeat checks only
-after relevant changes or new evidence. If the same approach fails twice without new evidence,
-change the approach or identify the missing information. Do not add review rounds after completion.
-
-## Default optimization
-
-For every task: understand the full request → prepare concise outgoing instructions → retrieve
-relevant context → select a verified model for new calls → implement simply → respond concisely.
-Preserve all constraints, exact technical details, negative requirements and acceptance criteria;
-keep the original request authoritative. Avoid a separate rewriting model or narrated checklist.
-Use direct code and cohesive files; add abstractions only for concrete requirements or reuse.
-Lead responses with results and relevant evidence; omit filler, preserve uncertainty and needed detail.
-For broad/repeated discovery, use the local graph; for verbose logs, use recoverable excerpts.
-Read `.claude/policy/optimization.md` when choosing helpers or model routing, and
-`.claude/tools/README.md` for commands. No helper is required for a trivial task. Native prompt
-interception and active-session model switching remain host capabilities, not hook guarantees.
-
-## Choose the workflow
+## Workflow by scope
 
 | Scope | Process |
 | --- | --- |
-| Light: small fix, docs, local behavior-preserving edit | Focused plan; relevant regression or existing tests; review. No formal spec or mandatory delegation. |
-| Standard: feature, endpoint, UI flow, schema/infra change | `/sdd` six-element spec, then `/implement`. Approval already given in the conversation remains valid. |
-| High risk: auth, sensitive data, destructive operations, broad architectural change | Risk/rollback criteria and independent specialist review over the applicable workflow; fixes still use `/debug`, features use SDD. Recommend a fresh implementation session if it tests the handoff. |
+| Light: small fix, docs, behavior-preserving edit | Focused plan, applicable checks and review. No required spec or delegation. |
+| Standard: feature, endpoint, UI flow, schema/infra change | `/sdd` six-element spec → `/implement`; existing scope approval counts. |
+| High risk: auth, sensitive data, destructive work, broad architecture | Add risk/rollback criteria and independent review when available; report unavailable review. A fresh session is optional when testing the handoff helps. |
 
-No-behavior changes and genesis skip Red-Green; still verify the result. Bug fixes use
-`/debug` when the cause is unknown. Spikes are time-boxed research, not production code.
+Use `/start` for an empty project, `/debug` for an unknown defect, `/docs` for documentation,
+and `/maintain` for upkeep/adoption. Genesis, time-boxed spikes and no-behavior edits do not
+need artificial failing tests. High-risk fixes still use `/debug`; features use SDD.
 
-## Context discipline
+## Efficient execution
 
-Search relevant symbols and paths, read focused sections, then expand to callers, tests or
-contracts when needed. Reuse established findings until new evidence makes them stale.
-Keep command output concise; preserve exit status and relevant failures, with full logs
-available when needed. Truncation is not verification. Batch independent lookups.
-Before a needed session transition, preserve a compact handoff using
-`.claude/policy/delegation.md`; keep temporary progress out of permanent instructions.
+Understand → prepare concise outgoing instructions → retrieve context → select a verified
+model for new calls → implement simply → respond concisely. Preserve every constraint,
+exact technical value, negative requirement and acceptance criterion; the original request
+remains authoritative. No separate rewriting model or narrated optimization checklist.
 
-## On-demand guidance
+Search relevant symbols/paths, read focused sections, and expand to callers/tests/contracts
+when needed. Reuse findings until evidence changes. Batch independent lookups. Bound output
+without hiding exit status or failures; retain full diagnostic logs for recovery.
 
-Read only the applicable workflow and review material:
+For broad or repeated discovery, use the local graph; for verbose logs, use recoverable
+excerpts. Read `.claude/policy/optimization.md` for routing/helper decisions and
+`.claude/tools/README.md` for commands and limits. Native prompt replacement and active-model
+switching depend on the host. Trivial tasks need no helper call or delegation.
 
-- Skills: `start`, `sdd`, `implement`, `debug`, `docs`, `maintain` under `.claude/skills/`.
-- Review once for correctness, scope, errors and security. Read only relevant references in
-  `.claude/reviewers/` when a risk needs deeper checks; omit irrelevant checklists silently.
-- File conventions: `.claude/rules/`. Optional stack packs: `.claude/templates/stacks/`.
-- Large discovery: the read-only discovery agent; specialists are optional templates. Pass a bounded question,
-  relevant paths and constraints. Small lookups stay local. See `.claude/policy/delegation.md`.
+Review once for correctness, scope, errors and security; use only relevant references in
+`.claude/reviewers/`. Format coherent edits together, then verify. Repeat checks only after
+relevant changes or new evidence. If an approach fails twice without new evidence, change
+approach or identify what's missing. Finish when the requested behavior and checks are complete.
 
-## Tooling boundaries
+## Load only relevant guidance
 
-Default hooks provide startup guidance and safety checks. Run tests explicitly; format changed
-files once after coherent edits, before final verification. Automatic formatting, Stop testing
-and notifications are opt-in; see `.claude/hooks/README.md`.
-Read `.claude/hooks/README.md` when changing hook behavior or diagnosing protection gaps.
-The human manual is `.claude/README.md`; load it for installation or maintenance, not every task.
+- `.claude/rules/` and `.claude/templates/stacks/`: file conventions and optional stack packs.
+- `.claude/policy/delegation.md`: bounded discovery, optional specialists and compact handoffs.
+  Keep temporary progress out of permanent instructions.
+- `.claude/hooks/README.md`: hook configuration, guarantees and limitations. Startup guidance
+  and safety guards are default; automated testing, formatting and notifications are opt-in.
+- `.claude/README.md`: installation and maintenance manual; not required for ordinary tasks.

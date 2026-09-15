@@ -2,6 +2,7 @@
 
 This vault documents the starter itself. Host-project templates remain under `.claude/`.
 
+- [[audit]] — latest whole-project findings, changes and validation
 - [[architecture]] — ownership, runtime flow, verification and platform boundaries
 - [[decisions/0001-canonical-kit]] — shared-source and proportional-workflow decision
 - [[decisions/0002-lean-defaults]] — optional automation and smaller active catalog

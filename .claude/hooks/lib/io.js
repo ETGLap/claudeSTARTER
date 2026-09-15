@@ -33,9 +33,6 @@ const additionalContext = (hookEventName, text) => ({
   hookSpecificOutput: { hookEventName, additionalContext: text },
 });
 
-/** Stop / PostToolUse blocking envelope. */
-const block = (reason) => ({ decision: "block", reason });
-
 /**
  * Run a hook body. Whatever it resolves to is emitted as JSON; null/undefined emits
  * nothing. Any throw is swallowed. The process always exits 0.
@@ -52,4 +49,4 @@ async function run(body) {
   }
 }
 
-module.exports = { readStdin, run, preToolUse, additionalContext, block };
+module.exports = { readStdin, run, preToolUse, additionalContext };

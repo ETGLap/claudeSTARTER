@@ -131,3 +131,20 @@ test('graph cache symlinks do not overwrite another file', (t) => {
   assert.equal(result.matches[0].path,'source.js'); assert.ok(result.cacheWarning);
   assert.equal(fs.readFileSync(path.join(root,'keep.txt'),'utf8'),'keep');
 });
+
+test('malformed cached symbols are rebuilt even when the file hash matches', (t) => {
+  const { root, write } = fixture(t);
+  write('source.js', 'function presentName() {}'); queryGraph(root,'presentName');
+  const cacheFile=path.join(root,'.claude/.state/code-graph.json');
+  const cache=JSON.parse(fs.readFileSync(cacheFile,'utf8'));
+  cache.files['source.js'].symbols=[null];
+  fs.writeFileSync(cacheFile,JSON.stringify(cache));
+  const result=queryGraph(root,'presentName');
+  assert.equal(result.parsed,1); assert.equal(result.matches[0].symbols[0].name,'presentName');
+});
+
+test('a long opening line cannot crowd a later diagnostic out of the excerpt', () => {
+  const result=summarize('x'.repeat(20000)+'\nERROR: actual failure\nfinished');
+  assert.match(result.text,/ERROR: actual failure/);
+  assert.ok(result.text.length<=8000);
+});

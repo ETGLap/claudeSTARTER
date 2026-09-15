@@ -72,9 +72,6 @@ function configWarning() {
   try {
     const user = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
     if (!isPlainObject(user)) throw new Error();
-    for (const section of ["testGate", "format", "guards", "notify"]) {
-      if (user[section] !== undefined && !isPlainObject(user[section])) throw new Error();
-    }
     const validate = (value, defaults) => {
       for (const [key, candidate] of Object.entries(value)) {
         if (!(key in defaults)) continue;
@@ -89,9 +86,6 @@ function configWarning() {
     validate(user, DEFAULTS);
     if (user.testGate?.maxBlocks !== undefined && (!Number.isInteger(user.testGate.maxBlocks) || user.testGate.maxBlocks < 0)) throw new Error();
     if (user.testGate?.timeoutMs !== undefined && (!Number.isInteger(user.testGate.timeoutMs) || user.testGate.timeoutMs < 1 || user.testGate.timeoutMs > 600000)) throw new Error();
-    for (const section of ["testGate", "format"]) {
-      if (user[section]?.command !== undefined && typeof user[section].command !== "string") throw new Error();
-    }
     return null;
   } catch {
     return "Conductor configuration is missing or invalid. Check .claude/conductor.config.json; verification is not established.";

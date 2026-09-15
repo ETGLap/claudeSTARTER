@@ -1,202 +1,110 @@
 # Conductor
 
-Version: see [VERSION](VERSION). Portable engineering instructions and Node hooks for Claude
-Code, with optional Codex adapters. Zero runtime package dependencies. Requires Node 22+
-on PATH; hooks do not assume the assistant's own bundled runtime is exposed as `node`.
-Hook commands are tested on macOS/Linux shells. Windows shell command portability is not
-verified; notification code has a best-effort Windows implementation.
+Portable engineering workflow for Claude Code, with optional Codex adapters. Version:
+[VERSION](VERSION). Node 22+ on PATH and Git; zero runtime package dependencies.
+Shell commands are tested on macOS/Linux. Windows shell portability and native notification
+behavior require a host smoke test.
 
 ## Install
 
-1. Copy this `.claude/` directory into the target project, excluding `.state/` and
-   `settings.local.json`. Merge existing settings and custom extensions; do not blindly
-   overwrite the host's files. Templates are starting material, not project facts.
-2. Empty project: `/start <idea>` establishes a toolchain, test runner, stack decision and
-   project instructions. Existing code: `/maintain project` adopts the workflow.
-3. Record the real test and formatter commands in project context. Run them explicitly
-   during implementation. Automatic testing/formatting is disabled and unregistered by default.
-4. Run the configured checks, inspect their output, and inspect the assistant's hook
-   diagnostics. Host trust/permission settings control whether hooks actually execute.
+1. Copy `.claude/` into the host, excluding `.state/` and `settings.local.json`. Merge existing
+   configuration and custom extensions. Templates are starting material, not project facts.
+2. Use `/start <idea>` for an empty project or `/maintain project` for existing code.
+3. Record actual test/formatter commands in project context and run them explicitly. Default
+   hooks provide startup guidance and safety guards; optional automation requires registration.
+4. Check hook diagnostics and one harmless protected-operation preview. Host trust and
+   permissions determine whether hooks actually run.
 
-## Workflows
+## Workflows and navigation
 
-| Task | Workflow |
+Small changes use focused verification; substantial changes use `/sdd` → `/implement`.
+High-risk work adds risk/rollback criteria and independent review. Approval already given
+counts; commits and fresh sessions are not mandatory workflow steps.
+
+| Need | Authoritative location |
 | --- | --- |
-| Small fix, docs, local behavior-preserving change | Focused plan and verification; no forced spec, delegation, or commit |
-| Substantial feature, endpoint, UI flow, schema/infra change | `/sdd` defines six elements; `/implement` builds and verifies the approved behavior |
-| Bug with unknown cause | `/debug`: reproduce, isolate, failing regression, fix, verify |
-| High-risk work | Add risk/rollback criteria and independent specialist review to the applicable workflow |
-| Documentation | `/docs` updates affected knowledge under the implementation's authorization |
-| Kit or project upkeep | `/maintain` or `/maintain project` |
+| Default decisions and scope routing | [CLAUDE.md](CLAUDE.md), imported by root project instructions |
+| Stable host facts | [context/project-context.md](context/project-context.md) |
+| Genesis/spec/build/debug/docs/upkeep | [skills/](skills/) — six workflows |
+| File conventions | [rules/](rules/) |
+| Risk-specific review | [reviewers/](reviewers/) — load only relevant references |
+| Bounded discovery and handoff | [policy/delegation.md](policy/delegation.md) |
+| Input/output/model/context optimization | [policy/optimization.md](policy/optimization.md) |
+| Local helper commands and limits | [tools/README.md](tools/README.md) |
+| Hook execution, configuration and coverage | [hooks/README.md](hooks/README.md) |
+| Optional specialists | [templates/agents/](templates/agents/) — copy selected definitions into `agents/` |
+| Stack packs and document skeletons | [templates/](templates/) — create only what the project needs |
+| Project knowledge and decisions | Host `docs-vault/`; stable decisions are append-only ADRs |
 
-A six-element spec contains outcomes, scope, constraints, prior decisions, tasks and
-verification. Existing approval to implement an agreed proposal counts; questions resolve
-material gaps rather than repeating an interview. Fresh sessions are useful for high-risk
-handoffs but optional. Commits follow user/project authorization, not skill invocation alone.
-
-## Integrated optimization
-
-The imported core activates input preparation, targeted discovery, model-selection discipline,
-simple implementation and concise generation for every task. The [policy](policy/optimization.md)
-explains when to use the dependency-free [local helpers](tools/README.md): JSON preparation,
-lexical graph queries, model recommendations and recoverable log excerpts. No new hook is
-registered. Model access and task capability must be verified by the host before routing.
-
-## Context and tool costs
-
-Use a fresh session for unrelated work. Before leaving unfinished work, preserve the compact
-[handoff](policy/delegation.md#session-handoffs); retain decisions and evidence, not a transcript.
-Do not reset merely because a timer or fixed context percentage has elapsed.
-
-In Claude Code, `/context` identifies context overhead; current documentation uses `/usage`
-for session tokens and plan usage. An optional status line can make usage visible without
-asking the model to report it every turn. Commands vary by installed version. Subscription
-allocation, estimated API cost and context occupancy are different measurements.
-See the [official cost guide](https://code.claude.com/docs/en/costs).
-
-Enable tools for an actual project need. Prefer an available CLI when it completes the task
-clearly with less overhead; choose MCP when structured access or its capabilities help.
-Deferred tool loading means MCP definitions are not universally loaded in full upfront.
-Inspect the actual footprint before disconnecting tools, and do not install redundant
-integrations. See [MCP guidance](https://code.claude.com/docs/en/mcp).
-
-Supply the outcome, constraints and relevant file references together when known. Start with
-focused evidence, then expand if needed. Bound routine command output while retaining full
-failure diagnostics and the original exit status. Do not hide errors behind a successful
-output-filtering command.
-
-Choose models and delegation by measured total task cost and correctness. Fixed model quotas,
-file-count delegation rules and assumed savings multipliers are not kit policy. Evaluate one
-helper at a time on comparable tasks; include retries and subagent usage in the result.
-
-## Where knowledge lives
-
-- `CLAUDE.md`: concise core principles and workflow routing, loaded with the root import.
-- Root project `CLAUDE.md`: project-owned constraints; preserve it during upgrades.
-- `context/project-context.md`: stable host facts; fill during adoption and keep current.
-- `rules/`: path-specific conventions. Applicable stack guidance refines generic defaults.
-- `skills/`: six workflows, loaded on demand.
-- `reviewers/`: optional references for relevant risks; no separate review-skill listing.
-- `agents/`: discovery only. Specialist definitions live in `templates/agents/`; copy only
-  those needed into `agents/`. Tests/code stay in the main session unless requested otherwise.
-- `templates/`: specs, project instructions, document skeletons and optional stack packs.
-  Enable a stack by copying its pack into `.claude/skills/<stack>/SKILL.md`.
-- `hooks/`: checks for supported tool events; [coverage and limits](hooks/README.md).
-- Host `docs-vault/`: living knowledge, shared-building-block map, specs and append-only ADRs.
-
-`.env.example` is a public template: variable names and empty/obviously fake values only.
-Real env files and key material remain protected on supported direct read/write operations.
-This path convention is not a content-based secret scanner.
+The active agent is discovery. Tests/code stay in the main session unless requested otherwise.
+Enable a stack by copying its template into `.claude/skills/<stack>/SKILL.md`.
+Real env/key files are protected on supported operations; `.env.example` holds only variable
+names and empty/obviously fake values. Path checks cannot prove content is secret-free.
 
 ## Optional automation
 
-The default wiring registers only startup guidance and safety guards. It has no prompt scan,
-per-edit formatter, Stop test runner or notifier. For a requested automation:
+1. Merge only the requested entry from [templates/hooks.optional.json](templates/hooks.optional.json)
+   into [settings.json](settings.json), preserving existing groups.
+2. Enable its section in [conductor.config.json](conductor.config.json); test/formatter commands
+   must target the host application. Setting a command alone does not register or enable a hook.
+3. Restart and verify the chosen hook. Remove registration when disabling it to avoid no-op
+   process launches. See the [hook manual](hooks/README.md) for cache/retry/timeout contracts.
 
-1. Merge only its hook entry from `templates/hooks.optional.json` into `settings.json`,
-   preserving existing groups. Do not copy every optional entry.
-2. Enable its config section and set the real command when required. The example below
-   illustrates opting into testing and formatting; it is not the shipping default.
-3. Restart the host and verify the chosen hook. Remove its registration to avoid process
-   launches when disabling it again.
+Use a formatter already installed by the host. Optional checks do not replace verification
+of the requested behavior. Notifications indicate a stopped turn, not verified success.
 
-Config alone does not register a hook. Normal workflow verification remains required even
-when all optional automation is disabled.
+## Context and cost inspection
 
-```json
-{
-  "testGate": {
-    "enabled": true,
-    "command": "npm test",
-    "maxBlocks": 2,
-    "cache": false,
-    "timeoutMs": 300000
-  },
-  "format": { "enabled": true, "command": "npx --no-install prettier --write" },
-  "notify": { "enabled": false },
-  "injectContext": true
-}
-```
+Use `/context` to inspect context and the installed Claude version's usage display (`/usage`
+in current documentation) for token/plan information. An optional status line avoids model
+calls just to report usage. Context occupancy, API cost estimates and subscription allocation
+are different measurements; see the [official guide](https://code.claude.com/docs/en/costs).
 
-Use a formatter already installed by the project. Commands run at the kit's project root;
-write targets resolve against the tool payload's working directory. Caching is off by
-default. Enable it only for suites determined by tracked/non-ignored files and the command.
-Ignored inputs, environment changes, dependencies, clocks and external services are outside
-that cache contract. The gate hashes file contents and verifies the snapshot stayed stable
-during the run; unsupported/large trees rerun the suite. It is not a universal test oracle.
-
-After `maxBlocks` failed continuation attempts, the gate returns control with an explicit
-verification-failed message. It does not mark the task verified. Format/configuration errors
-are also reported. Notifications are opt-in and report a stopped turn, not verified success.
+Start a fresh session for unrelated work; preserve a [handoff](policy/delegation.md#session-handoffs)
+for unfinished work. CLI/MCP selection, model eligibility and helper limitations live in the
+[optimization policy](policy/optimization.md). Measure complete tasks, including retries;
+character reduction alone does not establish billing savings.
 
 ## Codex
 
-Install `.claude/`, the optional `.codex/` adapters and `.agents/skills/` together. The root
-AGENTS.md in the starter describes this development repository: **do not copy it into a
-host project**. Merge [templates/agents-root.md](templates/agents-root.md) into the host's
-AGENTS.md instead. Codex needs explicit guidance to read the shared core and applicable
-rules; it does not rely on Claude's @import or path-rule loading.
+Install `.claude/`, `.codex/` and `.agents/skills/` together. Merge
+[templates/agents-root.md](templates/agents-root.md) into host AGENTS.md; **do not copy the
+starter's root AGENTS.md**, which describes kit development. Codex reads the shared core and
+applicable rules explicitly rather than using Claude's @imports or path-rule loading.
 
-- Hook commands resolve through the Git root; initialize a Git repository first. Existing
-  hook trust/settings remain in control; this kit does not disable permission checks.
-- `.codex/hooks/` forwards to the canonical implementation and configuration in `.claude/`.
-- Bash and standard `apply_patch` payloads are supported, including multiple files, deletes
-  and moves. Hook checks also recognize direct `Read`/`Write`/`Edit` payloads when supplied.
-- Codex currently does not support a PreToolUse `ask` response. The adapter turns a guarded
-  ask into a deny with an explanation. Review and run an approved operation manually, or
-  explicitly configure its guard; the adapter cannot open a confirmation prompt.
-- Codex agents have a read-only sandbox and inherit the configured model. Claude-specific
-  model aliases and preloaded-skill fields are not copied into Codex TOML.
-- Optional hook entries are in `.codex/hooks.optional.json`; merge only the chosen entries
-  into `.codex/hooks.json` and enable their shared config. No Notification event is supported.
-- Optional specialist TOML files are in `.codex/agents.optional/`; copy selected files into
-  `.codex/agents/`. Keep unused templates outside the active agent directory.
-- Restart a session after changing skills/agents/hooks and verify the hooks were loaded.
+- Initialize Git first: hook commands resolve from its root. Existing trust controls apply.
+- `.codex/hooks/` forwards to canonical `.claude/` implementations. Bash and standard multi-file
+  `apply_patch` payloads are supported, plus direct file-operation payloads when supplied.
+- Codex cannot request PreToolUse confirmation: adapters turn `ask` into `deny`. Review and run
+  approved operations manually or explicitly configure the relevant guard.
+- Merge chosen entries from `.codex/hooks.optional.json` and enable their shared config.
+  No Codex Notification event is registered.
+- Copy selected `.codex/agents.optional/` definitions into `.codex/agents/`. Agents are read-only
+  and inherit the configured model; Claude aliases/preloaded-skill metadata are not copied.
+- Restart after changing skills/agents/hooks and verify host loading and trust.
 
-The adapter targets the [documented hook contract](https://learn.chatgpt.com/docs/hooks)
-and [custom-agent format](https://learn.chatgpt.com/docs/agent-configuration/subagents),
-reviewed on 2026-09-15. Automated subprocess tests verify payload/output behavior; an actual
-interactive Claude/Codex session must still verify installation and trust on each host.
+Contracts: [hooks](https://learn.chatgpt.com/docs/hooks) and
+[custom agents](https://learn.chatgpt.com/docs/agent-configuration/subagents), reviewed 2026-09-15.
+Subprocess tests cover behavior; interactive installation and OS notification checks remain manual.
 
 ## Upgrade
 
-1. Record the installed VERSION and save a reviewed working-tree checkpoint.
-2. Compare the new kit against the installed one. Preserve host config, root instructions,
-   project context, local settings and custom rules/skills/agents. Do not copy `.state/`.
-3. Merge changed kit-owned files; review removed/renamed files manually. This kit has no
-   destructive updater. Version changes do not automatically replace host customizations.
-4. If using Codex, install the matching generated adapters alongside the canonical files.
-5. Validate JSON, run `node --test .claude/hooks/*.test.js .claude/tools/*.test.js`, then run the host's actual test
-   and formatter commands. Check hook startup and one harmless protected-operation preview.
+1. Record VERSION and save a reviewed checkpoint. Preserve root instructions, project context,
+   config, local settings and custom rules/skills/agents; never copy `.state/`.
+2. Merge changed kit files and matching Codex adapters. Review removals/renames and preserve
+   customizations. There is no destructive host updater.
+3. Validate JSON and run `node --test .claude/hooks/*.test.js .claude/tools/*.test.js`, then
+   the host's actual checks. Verify hook startup and a protected-operation preview.
 
-### Changes in 0.4.0
-
-Adds the unified optimization policy and local preparation, graph, routing and log helpers.
-Existing hook wiring and the active skill/agent catalog remain unchanged. Copy the tools
-folder and updated core/policy together; helpers use Node built-ins and existing Git only.
-Models in the example catalog are unavailable/unvalidated until checked for the host.
-
-### Changes in 0.3.0
-
-Lean defaults: startup and guards only; testing, formatting and notifications are opt-in.
-Spec authorship tracking and per-prompt context injection were removed. Review lenses moved
-from skills into references; six specialist agents moved into optional templates.
-
-On upgrade, remove old `UserPromptSubmit` context-inject and `PostToolUse` spec-session
-registrations, including local settings. Remove duplicate local Stop test hooks. Review
-existing formatter/test/notifier registrations explicitly; copying a disabled config alone
-still leaves hook processes launching. Remove obsolete generated library/test wrappers and
-old review-skill/agent copies only after preserving project customizations.
-
-### Changes in 0.2.0
-
-Content-aware optional test caching, isolated retry state, visible check failures, public
-example env files, quote-aware literal shell checks, shared Codex adapters, proportional
-workflows and shorter core context. Existing installs must opt in again to test caching.
+Migration notes: remove obsolete per-prompt context-inject, spec-session and duplicate local
+Stop-test registrations. Review existing formatter/test/notifier registrations explicitly;
+disabled config still leaves registered processes launching. Review obsolete library/test
+wrappers and review-skill/agent copies before removing them. Existing installs must explicitly
+opt into caching; preserve its documented input limitations. Version 0.4 adds the local tools;
+copy tools and core/policy together. Example model candidates remain unverified until checked.
 
 ## Extend
 
-Keep semantic judgment in concise guidance, occasional procedures in skills, and supported
-mechanical checks in hooks. New checks need a meaningful regression and a documented
-coverage boundary. Add agents and integrations for repeated, measured need. Smaller context
-and cheaper agents are hypotheses about cost until representative tasks establish savings.
+Keep semantic judgment in guidance, occasional procedures on demand and deterministic checks
+in hooks. Add meaningful regressions and coverage limits for new behavior. Add dependencies,
+agents or integrations only for demonstrated need; prefer reuse over new machinery.

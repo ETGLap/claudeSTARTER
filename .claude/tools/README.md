@@ -39,7 +39,7 @@ that a symbol is absent; use focused search for missing/unsupported relationship
 
 Each query hashes current content and reuses unchanged extraction. Deletions disappear on the
 next query. The kit's fixed `.state/code-graph.json` cache stores locations/names, not source
-bodies; it is ignored and disposable. Invalid caches rebuild; unavailable writes warn and
+bodies; it is ignored and disposable. Invalid JSON or malformed cached records rebuild; unavailable writes warn and
 leave the current query usable. Concurrent source changes require rerunning before relying
 on results. No watcher or separate session ledger is needed.
 
@@ -88,7 +88,8 @@ node .claude/tools/optimize.js summarize "$log_file" "$command_status"
 
 The summarizer exits with the original status (0–255), keeps the raw log unchanged and prints
 its path. Short output passes through; long output yields numbered opening/closing lines and
-error-adjacent excerpts with omission notices. Excerpts are capped at 8,000 characters before
+error-adjacent excerpts with omission notices. Long selected lines are clipped individually
+so an opening line cannot consume the whole diagnostic budget. Excerpts are capped at 8,000 characters before
 metadata. Logs larger than 5 MiB require a focused diagnostic range instead. Filtering can
 miss failures: recover the raw evidence before diagnosing an omitted detail. Do not put
 secrets in captured logs. Clean up task-created logs after they are no longer needed; no

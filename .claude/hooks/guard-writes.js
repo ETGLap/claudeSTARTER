@@ -1,11 +1,6 @@
 #!/usr/bin/env node
 "use strict";
 
-// PreToolUse guard for file writes. Turns three prose rules into enforced ones:
-//   ADRs are append-only · implemented specs are superseded, not rewritten ·
-//   secret material is never written by Claude.
-// Judgment lives in lib/guards.js; this file only does I/O.
-
 const fs = require("node:fs");
 const path = require("node:path");
 const { run, preToolUse } = require("./lib/io.js");
@@ -28,17 +23,16 @@ run((payload) => {
   if (payload.tool_name === "apply_patch" && targets.length === 0) {
     return preToolUse({ permissionDecision: "deny", permissionDecisionReason: "Cannot inspect this patch's file paths. Supply a standard apply_patch payload." });
   }
+  const guards = loadConfig().guards;
+  const config = payload.tool_name === "Read" ? { ...guards, adrAppendOnly: false, implementedSpecs: false } : guards;
   const decisions = targets.map((filePath) => {
-
     const resolved = path.resolve(payload.cwd || process.cwd(), filePath);
     const exists = fs.existsSync(resolved);
     const decision = decideWrite({
       filePath: resolved,
       exists,
       content: exists && /(^|\/)docs-vault\/specs\//.test(resolved) ? readIfSmall(resolved) : null,
-      config: payload.tool_name === "Read"
-        ? { ...loadConfig().guards, adrAppendOnly: false, implementedSpecs: false }
-        : loadConfig().guards,
+      config,
     });
     return decision;
   }).filter(Boolean);

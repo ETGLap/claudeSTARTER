@@ -61,11 +61,17 @@ function generatedFiles() {
   return files;
 }
 
+function isGenerated(text) {
+  if (text.startsWith(`// ${generated}\n`) || text.startsWith(`# ${generated}\n`)) return true;
+  const end = text.startsWith('---\n') ? text.indexOf('\n---\n', 4) : -1;
+  return end !== -1 && text.slice(end + 5).startsWith(`\n<!-- ${generated} -->\n`);
+}
+
 // Prune only marked generator-owned files; preserve custom adapters.
 function staleGeneratedFiles(expected = generatedFiles()) {
   return [".codex/hooks", ".codex/agents", ".codex/agents.optional", ".agents/skills"]
     .filter((dir) => fs.existsSync(path.join(ROOT, dir)))
-    .flatMap(walk).filter((file) => !expected.has(file) && read(file).includes(generated));
+    .flatMap(walk).filter((file) => !expected.has(file) && isGenerated(read(file)));
 }
 
 function sync(check = false) {
@@ -90,4 +96,4 @@ if (require.main === module) {
   else console.log(check ? "Adapters match canonical sources." : `Updated ${changed.length} adapters.`);
 }
 
-module.exports = { generatedFiles, staleGeneratedFiles, sync, platformText };
+module.exports = { generatedFiles, staleGeneratedFiles, sync, platformText, isGenerated };

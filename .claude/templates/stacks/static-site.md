@@ -39,5 +39,5 @@ Informs the spec→test→implement pipeline; never scaffolds code on its own.
 ## Test strategy
 
 Build success plus link checking is the automated tier, and it is usually enough.
-Accessibility and visual review are manual and documented. Do not unit-test static markup —
-Document meaningful manual verification where automated tests add little value.
+Accessibility and visual review are manual and documented; avoid unit tests that only
+restate static markup.

@@ -49,6 +49,15 @@ function readCache(file) {
   } catch { return {}; }
 }
 
+function validRecord(record, hash) {
+  const location = item => item && typeof item.name === 'string' && Number.isInteger(item.line) && item.line > 0;
+  return record?.hash === hash && typeof record.extractionLimited === 'boolean' &&
+    Array.isArray(record.symbols) && record.symbols.every(item => location(item) && ['function','class'].includes(item.kind)) &&
+    Array.isArray(record.calls) && record.calls.every(location) &&
+    Array.isArray(record.imports) && record.imports.every(item => typeof item === 'string') &&
+    Array.isArray(record.routeOrModelLines) && record.routeOrModelLines.every(line => Number.isInteger(line) && line > 0);
+}
+
 function queryGraph(directory, query, limits = {}) {
   if (typeof query !== 'string' || !query.trim() || query.length>200) throw new Error('Provide a focused query of 1–200 characters');
   const root = fs.realpathSync(directory);
@@ -72,7 +81,7 @@ function queryGraph(directory, query, limits = {}) {
       if (text.includes('\0')) { skipped++; continue; }
       const hash = crypto.createHash('sha256').update(text).digest('hex');
       const cached = previous[name];
-      const reusable = cached?.hash === hash && Array.isArray(cached.symbols) && Array.isArray(cached.imports) && Array.isArray(cached.calls) && Array.isArray(cached.routeOrModelLines);
+      const reusable = validRecord(cached, hash);
       const data = reusable ? cached : { hash, ...extract(text) };
       if (!reusable) parsed++;
       files[name] = data; indexed++;

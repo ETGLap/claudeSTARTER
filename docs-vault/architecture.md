@@ -61,4 +61,4 @@ The tested protocol follows the official [Codex hooks documentation](https://lea
 Opt-in caching covers file/command inputs only. Guards inspect supported operations, not
 arbitrary shell behavior. Retry exhaustion reports failure rather than pretending success.
 Static validation finds structural drift; contradictory prose still requires review.
-See the [hook manual](../.claude/hooks/README.md) and [[token-costs]].
+See the [hook manual](../.claude/hooks/README.md), [[token-costs]] and [[audit]].

@@ -14,7 +14,6 @@ async function runCodexHook(name) {
     }
     const result = spawnSync(process.execPath, [path.join(__dirname, "..", name), ...process.argv.slice(2)], {
       input: JSON.stringify(payload), encoding: "utf8", timeout: 615000,
-      env: { ...process.env, CONDUCTOR_HOST: "codex" },
     });
     if (result.status !== 0) {
       process.stdout.write(JSON.stringify({ systemMessage: "Conductor hook could not run. Verification is not established." }));

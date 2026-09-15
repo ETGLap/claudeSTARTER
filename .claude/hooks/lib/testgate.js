@@ -1,14 +1,6 @@
 "use strict";
 
-// Decision logic for the Stop test gate.
-//
-// Why this exists: `Stop` fires at the end of *every* turn, including turns that only
-// answered a question. Running a full suite each time is invisible at 0.7s and crippling at
-// three minutes, which is the difference between the kit being usable on a real project and
-// not. So the gate first asks whether anything could plausibly have changed the result.
-//
-// The rule is fail-safe, never fail-open: anything unknown runs the suite. A slow gate is a
-// nuisance; a silently skipped one defeats the only guarantee the kit makes about tests.
+// Optional test-cache decisions; unknown inputs require a fresh run.
 
 const crypto = require("node:crypto");
 
@@ -30,7 +22,7 @@ function treeSignature(head, status, files, command) {
 function shouldRunTests({ signature, last } = {}) {
   if (!signature) return true; // unknown state => run
   if (!last || typeof last !== "object") return true; // no prior run => run
-  if (last.green !== true) return true; // still red => keep blocking
+  if (last.green !== true) return true; // Failed results cannot be reused.
   return last.signature !== signature;
 }
 

@@ -1,10 +1,6 @@
 "use strict";
 
-// Branch lookup without spawning git.
-//
-// Why no subprocess: the UserPromptSubmit hook runs on every turn under a 30s budget, and
-// spawning git costs ~10ms plus a process each time. `.git/HEAD` is a one-line file — read
-// it directly and stay inside the zero-dependency, never-throw hook contract.
+// Read branch metadata directly, including nested directories and worktrees.
 
 const fs = require("node:fs");
 const path = require("node:path");
