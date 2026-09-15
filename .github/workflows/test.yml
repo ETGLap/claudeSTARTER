@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: '3.12'
       # Explicit globs include the dot-directory and the starter maintenance tests.
-      - run: node --test .claude/hooks/*.test.js scripts/*.test.js
+      - run: node --test .claude/hooks/*.test.js .claude/tools/*.test.js scripts/*.test.js
       - run: node scripts/validate-kit.js
       - name: Parse generated Codex agent configuration
         run: python3 -c "import pathlib,tomllib; [tomllib.loads(p.read_text()) for p in pathlib.Path('.codex').glob('agents*/*.toml')]"

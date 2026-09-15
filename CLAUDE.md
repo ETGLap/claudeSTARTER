@@ -10,12 +10,15 @@ The optional Codex adapters share that canonical source. See `docs-vault/README.
 - Zero runtime dependencies: Node built-ins only. No host package.json or install step.
 - Keep hook decisions testable in `.claude/hooks/lib/`; entry points handle execution.
   Hooks exit 0 and use supported JSON responses. Important failures must be visible.
-- Test with `node --test .claude/hooks/*.test.js`; use the explicit glob for the dot-directory.
+- Test with `node --test .claude/hooks/*.test.js .claude/tools/*.test.js`; explicit globs include dot-directories.
   Validate wiring and generated adapters with `node scripts/validate-kit.js`.
 - Shared implementation lives in `.claude/`; regenerate `.codex/` and `.agents/` adapters
   with `node scripts/sync-adapters.js`. Do not independently edit generated files.
 - Conventional Commits when authorized. Do not commit directly to main or rewrite history
   without approval. Keep edits limited to the requested work.
+
+Optimization implementation lives in `.claude/tools/`; operating rules are linked from the
+imported core. Research and acceptance evidence live in `docs-vault/optimization-research.md`.
 
 ## Shipping boundaries
 

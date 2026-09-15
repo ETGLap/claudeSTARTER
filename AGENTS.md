@@ -11,12 +11,15 @@ The optional Codex adapters share that canonical source. See `docs-vault/README.
 - Zero runtime dependencies: Node built-ins only. No host package.json or install step.
 - Keep hook decisions testable in `.claude/hooks/lib/`; entry points handle execution.
   Hooks exit 0 and use supported JSON responses. Important failures must be visible.
-- Test with `node --test .claude/hooks/*.test.js`; use the explicit glob for the dot-directory.
+- Test with `node --test .claude/hooks/*.test.js .claude/tools/*.test.js`; explicit globs include dot-directories.
   Validate wiring and generated adapters with `node scripts/validate-kit.js`.
 - Shared implementation lives in `.claude/`; regenerate `.codex/` and `.agents/` adapters
   with `node scripts/sync-adapters.js`. Do not independently edit generated files.
 - Conventional Commits when authorized. Do not commit directly to main or rewrite history
   without approval. Keep edits limited to the requested work.
+
+Optimization implementation lives in `.claude/tools/`; operating rules are linked from the
+imported core. Research and acceptance evidence live in `docs-vault/optimization-research.md`.
 
 ## Shipping boundaries
 
@@ -57,6 +60,19 @@ and `.claude/context/project-context.md`; this kit scaffolds only at project gen
 Finish when the requested behavior is complete and applicable checks pass. Repeat checks only
 after relevant changes or new evidence. If the same approach fails twice without new evidence,
 change the approach or identify the missing information. Do not add review rounds after completion.
+
+## Default optimization
+
+For every task: understand the full request → prepare concise outgoing instructions → retrieve
+relevant context → select a verified model for new calls → implement simply → respond concisely.
+Preserve all constraints, exact technical details, negative requirements and acceptance criteria;
+keep the original request authoritative. Avoid a separate rewriting model or narrated checklist.
+Use direct code and cohesive files; add abstractions only for concrete requirements or reuse.
+Lead responses with results and relevant evidence; omit filler, preserve uncertainty and needed detail.
+For broad/repeated discovery, use the local graph; for verbose logs, use recoverable excerpts.
+Read `.claude/policy/optimization.md` when choosing helpers or model routing, and
+`.claude/tools/README.md` for commands. No helper is required for a trivial task. Native prompt
+interception and active-session model switching remain host capabilities, not hook guarantees.
 
 ## Choose the workflow
 

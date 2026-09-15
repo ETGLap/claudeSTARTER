@@ -67,3 +67,22 @@ No skill, agent, hook or dependency was added. Context thresholds, confidence pe
 model quotas and fixed savings claims remain outside kit policy. These are advisory practices,
 not enforced runtime limits. Run the validator for the current imported instruction size;
 the 0.3.0 measurements above record the earlier lean baseline.
+
+## Unified layer (0.4.0)
+
+The imported starter instruction layer is 7,366 characters (~1,842 tokens by the rough
+four-character estimate); this includes routing to the on-demand optimization policy.
+Default hooks remain three, skills six and active agents one. Added helpers are local Node
+commands; there are no provider calls, new dependencies, model-dispatch loops or background scans.
+
+Synthetic observations (not representative billed savings): a formatted JSON request fell
+from 183 to 149 characters with tokens/values preserved. A repetitive 79,251-character log
+produced an 828-character excerpt retaining the fixture failure; recovery metadata is extra.
+These examples measure whitespace removal and selected context, not comprehension quality,
+model usage or end-to-end cost. The graph fixture confirms cached extraction is reused and
+same-size edits with restored timestamps still refresh through content hashing.
+
+Native incoming chat rewriting and active-session model switching are not implemented:
+those require host support. Preparation/generation are default instructions; routing is a
+verified-catalog recommendation for new calls. No account capability benchmark was run.
+See [[optimization-research]] and [[specs/0002-optimization-layer]].

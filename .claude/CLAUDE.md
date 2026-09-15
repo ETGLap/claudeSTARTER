@@ -27,6 +27,19 @@ Finish when the requested behavior is complete and applicable checks pass. Repea
 after relevant changes or new evidence. If the same approach fails twice without new evidence,
 change the approach or identify the missing information. Do not add review rounds after completion.
 
+## Default optimization
+
+For every task: understand the full request → prepare concise outgoing instructions → retrieve
+relevant context → select a verified model for new calls → implement simply → respond concisely.
+Preserve all constraints, exact technical details, negative requirements and acceptance criteria;
+keep the original request authoritative. Avoid a separate rewriting model or narrated checklist.
+Use direct code and cohesive files; add abstractions only for concrete requirements or reuse.
+Lead responses with results and relevant evidence; omit filler, preserve uncertainty and needed detail.
+For broad/repeated discovery, use the local graph; for verbose logs, use recoverable excerpts.
+Read `.claude/policy/optimization.md` when choosing helpers or model routing, and
+`.claude/tools/README.md` for commands. No helper is required for a trivial task. Native prompt
+interception and active-session model switching remain host capabilities, not hook guarantees.
+
 ## Choose the workflow
 
 | Scope | Process |

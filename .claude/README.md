@@ -34,6 +34,14 @@ verification. Existing approval to implement an agreed proposal counts; question
 material gaps rather than repeating an interview. Fresh sessions are useful for high-risk
 handoffs but optional. Commits follow user/project authorization, not skill invocation alone.
 
+## Integrated optimization
+
+The imported core activates input preparation, targeted discovery, model-selection discipline,
+simple implementation and concise generation for every task. The [policy](policy/optimization.md)
+explains when to use the dependency-free [local helpers](tools/README.md): JSON preparation,
+lexical graph queries, model recommendations and recoverable log excerpts. No new hook is
+registered. Model access and task capability must be verified by the host before routing.
+
 ## Context and tool costs
 
 Use a fresh session for unrelated work. Before leaving unfinished work, preserve the compact
@@ -158,8 +166,15 @@ interactive Claude/Codex session must still verify installation and trust on eac
 3. Merge changed kit-owned files; review removed/renamed files manually. This kit has no
    destructive updater. Version changes do not automatically replace host customizations.
 4. If using Codex, install the matching generated adapters alongside the canonical files.
-5. Validate JSON, run `node --test .claude/hooks/*.test.js`, then run the host's actual test
+5. Validate JSON, run `node --test .claude/hooks/*.test.js .claude/tools/*.test.js`, then run the host's actual test
    and formatter commands. Check hook startup and one harmless protected-operation preview.
+
+### Changes in 0.4.0
+
+Adds the unified optimization policy and local preparation, graph, routing and log helpers.
+Existing hook wiring and the active skill/agent catalog remain unchanged. Copy the tools
+folder and updated core/policy together; helpers use Node built-ins and existing Git only.
+Models in the example catalog are unavailable/unvalidated until checked for the host.
 
 ### Changes in 0.3.0
 

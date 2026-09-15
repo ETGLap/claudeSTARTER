@@ -20,7 +20,7 @@ High-risk work adds risk review; a fresh implementation session is recommended w
 Node 22 or later and Git are required; there are no runtime package dependencies.
 
 ```sh
-node --test .claude/hooks/*.test.js scripts/*.test.js
+node --test .claude/hooks/*.test.js .claude/tools/*.test.js scripts/*.test.js
 node scripts/sync-adapters.js --check
 node scripts/validate-kit.js
 ```

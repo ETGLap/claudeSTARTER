@@ -22,6 +22,14 @@ See [[decisions/0001-canonical-kit]], [[decisions/0002-lean-defaults]] and
 - `.claude/.state/` contains disposable session records. All tests use temporary host copies.
 - `.claude/context/project-context.md` remains a blank template by design.
 
+## Optimization
+
+The shared core routes the six strategies through `.claude/policy/optimization.md`.
+`.claude/tools/optimize.js` exposes local operations; `optimization.js` holds pure prompt,
+log and routing logic; `graph.js` owns bounded Git discovery, extraction and cache I/O.
+Tools are available on demand and do not register hooks or call models. Semantic quality
+checks remain advisory. See [[optimization-research]] and [[specs/0002-optimization-layer]].
+
 ## Shared building blocks
 
 | Need | Reuse |
@@ -38,7 +46,7 @@ See [[decisions/0001-canonical-kit]], [[decisions/0002-lean-defaults]] and
 
 ## Verification
 
-Run `node --test .claude/hooks/*.test.js scripts/*.test.js`, then
+Run `node --test .claude/hooks/*.test.js .claude/tools/*.test.js scripts/*.test.js`, then
 `node scripts/validate-kit.js`. CI uses Node 22 on Ubuntu and macOS, validates generated
 adapter parity and parses Codex agent TOML. The blank shipped test command prevents the
 kit's own tests from being mistaken for verification of a host application.
