@@ -69,6 +69,15 @@ change the approach or identify the missing information. Do not add review round
 No-behavior changes and genesis skip Red-Green; still verify the result. Bug fixes use
 `/debug` when the cause is unknown. Spikes are time-boxed research, not production code.
 
+## Context discipline
+
+Search relevant symbols and paths, read focused sections, then expand to callers, tests or
+contracts when needed. Reuse established findings until new evidence makes them stale.
+Keep command output concise; preserve exit status and relevant failures, with full logs
+available when needed. Truncation is not verification. Batch independent lookups.
+Before a needed session transition, preserve a compact handoff using
+`.claude/policy/delegation.md`; keep temporary progress out of permanent instructions.
+
 ## On-demand guidance
 
 Read only the applicable workflow and review material:

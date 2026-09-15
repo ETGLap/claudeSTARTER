@@ -34,6 +34,33 @@ verification. Existing approval to implement an agreed proposal counts; question
 material gaps rather than repeating an interview. Fresh sessions are useful for high-risk
 handoffs but optional. Commits follow user/project authorization, not skill invocation alone.
 
+## Context and tool costs
+
+Use a fresh session for unrelated work. Before leaving unfinished work, preserve the compact
+[handoff](policy/delegation.md#session-handoffs); retain decisions and evidence, not a transcript.
+Do not reset merely because a timer or fixed context percentage has elapsed.
+
+In Claude Code, `/context` identifies context overhead; current documentation uses `/usage`
+for session tokens and plan usage. An optional status line can make usage visible without
+asking the model to report it every turn. Commands vary by installed version. Subscription
+allocation, estimated API cost and context occupancy are different measurements.
+See the [official cost guide](https://code.claude.com/docs/en/costs).
+
+Enable tools for an actual project need. Prefer an available CLI when it completes the task
+clearly with less overhead; choose MCP when structured access or its capabilities help.
+Deferred tool loading means MCP definitions are not universally loaded in full upfront.
+Inspect the actual footprint before disconnecting tools, and do not install redundant
+integrations. See [MCP guidance](https://code.claude.com/docs/en/mcp).
+
+Supply the outcome, constraints and relevant file references together when known. Start with
+focused evidence, then expand if needed. Bound routine command output while retaining full
+failure diagnostics and the original exit status. Do not hide errors behind a successful
+output-filtering command.
+
+Choose models and delegation by measured total task cost and correctness. Fixed model quotas,
+file-count delegation rules and assumed savings multipliers are not kit policy. Evaluate one
+helper at a time on comparable tasks; include retries and subagent usage in the result.
+
 ## Where knowledge lives
 
 - `CLAUDE.md`: concise core principles and workflow routing, loaded with the root import.

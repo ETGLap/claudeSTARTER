@@ -19,3 +19,20 @@ Claude custom agents normally inherit CLAUDE.md. Explore/Plan skip it; pass nece
 constraints explicitly when using them for literal lookups. Do not assume other harnesses
 have the same inheritance rules. Keep model selection configurable; measure total task
 cost and correctness before introducing a cheaper model or another delegation step.
+
+## Session handoffs
+
+Use only when pausing unfinished work, changing sessions, or preparing for compaction;
+completed small tasks need no handoff artifact. A short message or the existing task/spec
+note is sufficient. Preserve:
+
+- Objective, accepted scope and material constraints.
+- Decisions and their source links; changed files and relevant symbols.
+- Verification commands/results, including failures and checks not performed.
+- Unresolved issues, approaches ruled out and the next concrete action.
+
+Link to code and durable decisions instead of copying logs or conversation history. Keep
+stable facts in project context and ADRs. On resuming, check the current diff and any changed
+inputs before reusing prior results. A handoff does not grant new approval or prove tests pass.
+Do not clear or compact automatically, impose a context-percentage threshold, or reconstruct
+unrelated history merely to fill a summary.

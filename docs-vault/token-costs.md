@@ -55,3 +55,15 @@ Do not equate shorter instructions with a guaranteed billing reduction. A helper
 when the total completed task is cheaper or faster without lowering acceptance quality.
 MCP catalogs, added instructions and extra agents can add overhead; measure that as part of
 the task. No paid benchmark or third-party helper was installed by the reliability change.
+
+## Context discipline follow-up
+
+The starter now adds progressive reading and bounded command output to the shared core.
+The existing delegation policy holds an on-demand handoff format; the manual covers usage
+inspection and CLI/MCP selection. The architecture reference includes optional deletion,
+interface and abstraction checks only for requested design reviews.
+
+No skill, agent, hook or dependency was added. Context thresholds, confidence percentages,
+model quotas and fixed savings claims remain outside kit policy. These are advisory practices,
+not enforced runtime limits. Run the validator for the current imported instruction size;
+the 0.3.0 measurements above record the earlier lean baseline.
