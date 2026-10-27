@@ -1,7 +1,22 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert");
-const { buildSessionStart } = require("./lib/context");
+const { buildSessionStart, needsBootstrap } = require("./lib/context");
+
+test("bootstrap checks require a filled purpose and an explicit supported workflow reference", () => {
+  const state = { hasCodebase: true, context: "- **Purpose:** Track inventory.\n" };
+  for (const instructions of ["@.claude/CLAUDE.md", "@./.claude/CLAUDE.md\n", "Read `.claude/CLAUDE.md` for the shared workflow."]) {
+    assert.strictEqual(needsBootstrap({ ...state, instructions }), false);
+    for (const context of ["", "- **Purpose:** <what this project is>", "- **Purpose:**\n- **Stack:** Node", "# Project context\n"]) {
+      assert.strictEqual(needsBootstrap({ ...state, instructions, context }), "retrofit");
+    }
+  }
+  for (const instructions of ["", "# Existing instructions", "The file .claude/CLAUDE.md is not imported.", "@.claude/CLAUDE.md.backup", "Read `.claude/CLAUDE.md.backup` for history.", "Read .claude/CLAUDE.md.example for history."]) {
+    assert.strictEqual(needsBootstrap({ ...state, instructions }), "retrofit");
+  }
+  assert.strictEqual(needsBootstrap({ isStarter: true, hasCodebase: true }), "retrofit");
+  assert.strictEqual(needsBootstrap(), "genesis");
+});
 
 test("buildSessionStart: nudges bootstrap only while the project is un-bootstrapped", () => {
   assert.match(buildSessionStart({ needsBootstrap: "retrofit" }), /maintain project/);

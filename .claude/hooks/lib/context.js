@@ -1,5 +1,14 @@
 "use strict";
 
+// Inspect only the documented root references and purpose field, not arbitrary prose/imports.
+function needsBootstrap({ instructions = "", context = "", hasCodebase = false, isStarter = false } = {}) {
+  const linked = /(?:^@(?:\.\/)?\.claude\/CLAUDE\.md\s*$|\bRead\s+(?:`\.claude\/CLAUDE\.md`|\.claude\/CLAUDE\.md(?=\s|$)))/m.test(instructions);
+  const purpose = context.match(/^\s*(?:-\s+)?(?:\*\*)?Purpose:(?:\*\*)?[^\S\r\n]*([^\r\n]*)/m)?.[1].trim();
+  const configured = purpose && !/<[^>]+>/.test(purpose);
+  if (linked && (configured || isStarter)) return false;
+  return hasCodebase ? "retrofit" : "genesis";
+}
+
 // Only bootstrap guidance is emitted automatically; task context is resolved on demand.
 function buildSessionStart(state = {}) {
   const { needsBootstrap } = state;
@@ -15,8 +24,8 @@ function buildSessionStart(state = {}) {
     );
   } else if (needsBootstrap) {
     lines.push(
-      "This project is not bootstrapped (blank project-context.md, no root CLAUDE.md) — " +
-        "run `/maintain project`."
+      "Conductor setup appears incomplete: check the shared-workflow reference in root " +
+        "instructions and the purpose in .claude/context/project-context.md. Run `/maintain project`."
     );
   }
 
@@ -25,4 +34,4 @@ function buildSessionStart(state = {}) {
 }
 
 
-module.exports = { buildSessionStart };
+module.exports = { buildSessionStart, needsBootstrap };

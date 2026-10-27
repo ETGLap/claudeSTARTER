@@ -12,7 +12,8 @@ async function runCodexHook(name) {
     if (payload.tool_name === "Bash" && typeof payload.tool_input?.workdir === "string") {
       payload.cwd = path.resolve(payload.cwd || process.cwd(), payload.tool_input.workdir);
     }
-    const result = spawnSync(process.execPath, [path.join(__dirname, "..", name), ...process.argv.slice(2)], {
+    const args = name === "session-start.js" ? ["--codex"] : process.argv.slice(2);
+    const result = spawnSync(process.execPath, [path.join(__dirname, "..", name), ...args], {
       input: JSON.stringify(payload), encoding: "utf8", timeout: 615000,
     });
     if (result.status !== 0) {

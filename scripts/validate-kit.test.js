@@ -23,3 +23,17 @@ test("instruction validation follows nested imports and rejects cycles or missin
   fs.writeFileSync(path.join(root, "core.md"), "@CLAUDE.md\n");
   assert.throws(() => instructionGraph(root, "CLAUDE.md"), /Import cycle/);
 });
+
+test("test rules cover conventional supported filenames without matching ordinary source", {
+  skip: typeof path.matchesGlob !== "function" && "Node 22.5+ supplies the built-in glob matcher",
+}, () => {
+  const rules = fs.readFileSync(path.resolve(__dirname, "../.claude/rules/tests.md"), "utf8");
+  const patterns = [...rules.matchAll(/^  - "([^"]+)"$/gm)].map((match) => match[1]);
+  const matches = (file) => patterns.some((pattern) => path.matchesGlob(file, pattern));
+  for (const file of ["src/math.test.js", "src/view.spec.tsx", "src/math_test.go", "src/test_math.py", "src/math_test.py", "spec/math_spec.rb", "tests/check.py", "__tests__/view.tsx"]) {
+    assert.equal(matches(file), true, file);
+  }
+  for (const file of ["src/math.go", "src/math.py", "src/latest_math.py", "src/math.rb", "src/view.tsx"]) {
+    assert.equal(matches(file), false, file);
+  }
+});

@@ -15,6 +15,8 @@ See [[decisions/0001-canonical-kit]], [[decisions/0002-lean-defaults]] and
 - `scripts/sync-adapters.js` generates `.agents/skills/`, `.codex/agents/`, hook forwarders,
   Codex wiring and this starter's AGENTS.md. It prunes obsolete marked generated files.
   Only executable hook entry points get wrappers. It is a development tool, not a host updater.
+  Required `/start` platform translations tolerate paragraph reflow and reject missing or
+  duplicate matches; semantic regressions check Codex references independently of parity.
 - Six workflow skills and discovery are active. Specialized checklists are ordinary references;
   six specialist agents live in optional template directories until selected for a host.
 - Codex hook wrappers invoke the canonical scripts. `lib/codex.js` adapts working-directory
@@ -62,3 +64,8 @@ Opt-in caching covers file/command inputs only. Guards inspect supported operati
 arbitrary shell behavior. Retry exhaustion reports failure rather than pretending success.
 Static validation finds structural drift; contradictory prose still requires review.
 See the [hook manual](../.claude/hooks/README.md), [[token-costs]] and [[audit]].
+
+Unexpected shared-runner failures now emit a generic unverified-check warning without
+exception details. Startup checks documented root workflow references and a filled context
+purpose; the maintenance checkout retains its blank shipping template. These are bounded
+setup hints, not host-installation certification. Exact limits are in the hook manual.

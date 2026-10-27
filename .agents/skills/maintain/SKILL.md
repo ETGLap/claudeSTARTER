@@ -26,6 +26,7 @@ root instructions and the starter's `docs-vault/` for kit-specific knowledge.
 2. Adopt — when setup is incomplete, merge the shared-workflow reference into existing project instructions;
    preserve user rules. Establish context/docs and configure the actual test and formatter
    commands. An existing instruction file alone does not prove Conductor is configured.
+   Check applicable `.claude/rules/` patterns against the host's actual file layout.
 3. Audit — inspect structure, reuse, test gaps and relevant security/performance/accessibility
    risks. Use specialists only for independently useful questions. Prioritize evidence.
 4. Apply — if the user requested implementation of an agreed plan, proceed. Otherwise present

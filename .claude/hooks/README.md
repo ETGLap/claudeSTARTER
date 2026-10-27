@@ -4,6 +4,9 @@ Three default entry points and three optional entry points, configured by [condu
 [settings.json](../settings.json). Node built-ins only. Entry points return supported JSON
 and exit 0; the host decides what to block or display. A missing Node executable, host
 permission/trust decision, or host timeout can prevent a hook from completing.
+Unexpected exceptions in the shared runner emit a generic warning that the check is
+unverified. Exception messages, stacks and payloads are not included; the warning does not
+change permission decisions or introduce automatic blocking.
 
 ## Coverage
 
@@ -82,6 +85,20 @@ when needed. A file removed by a patch is skipped; a formatter removing its own 
 `injectContext` controls bootstrap guidance at SessionStart. There is no per-prompt spec
 scanner or authorship ledger. `/implement` resolves the requested spec from project files
 on demand; fresh sessions remain an optional handoff technique for high-risk work.
+
+Startup reads only the host's root instructions (`CLAUDE.md` for Claude, `AGENTS.md` for
+Codex) and project context, plus fixed setup markers. The Codex adapter passes `--codex`
+to select its root file; another host's wiring does not satisfy this check.
+It recognizes a direct `@.claude/CLAUDE.md` import (optionally `@./.claude/CLAUDE.md`) or
+the Codex template's explicit `Read .claude/CLAUDE.md` reference, and requires a nonempty,
+non-placeholder `Purpose:` field in context. Missing pieces prompt `/maintain project`
+when codebase markers exist, or `/start` otherwise. This is a setup hint, not verification
+of commands, complete facts or arbitrary indirect instruction imports. Custom instruction
+layouts may need manual adoption and `injectContext: false` to suppress the hint.
+The starter checkout, identified by both root maintenance scripts `scripts/sync-adapters.js`
+and `scripts/validate-kit.js`, may keep its shipping context blank; both hosts use its
+canonical root `CLAUDE.md` core reference for this exception. Startup does not write state
+or modify host files.
 
 ## Verification
 

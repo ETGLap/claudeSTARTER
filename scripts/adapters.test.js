@@ -6,7 +6,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const { host } = require("../.claude/hooks/fixtures/host");
-const { generatedFiles, staleGeneratedFiles } = require("./sync-adapters");
+const { generatedFiles, staleGeneratedFiles, platformText } = require("./sync-adapters");
 const ROOT = path.resolve(__dirname, "..");
 
 test("checked-in adapters match the canonical source", () => {
@@ -32,6 +32,12 @@ test("installed Codex hook commands work in a copied Git host from a nested cwd"
   assert.equal(denied.hookSpecificOutput.permissionDecision, "deny");
   const patch = "*** Begin Patch\n*** Add File: .env.local\n+x\n*** End Patch";
   assert.equal(run("PreToolUse", 0, { tool_name: "apply_patch", tool_input: { command: patch } }).hookSpecificOutput.permissionDecision, "deny");
+  h.write("package.json", "{}");
+  h.write(".claude/context/project-context.md", "- **Purpose:** Track inventory.\n");
+  h.write("CLAUDE.md", "@.claude/CLAUDE.md");
+  assert.match(run("SessionStart", 0, {})?.hookSpecificOutput?.additionalContext || "", /maintain project/);
+  h.write("AGENTS.md", "Read `.claude/CLAUDE.md` for the shared workflow.");
+  assert.equal(run("SessionStart", 0, {}), null);
   hooks = JSON.parse(fs.readFileSync(path.join(h.dir, ".codex/hooks.optional.json"), "utf8")).hooks;
   h.configure({ testGate: { enabled: true, command: `${JSON.stringify(process.execPath)} -e "process.exit(1)"` } });
   assert.equal(run("Stop", 0, {}).decision, "block");
@@ -41,6 +47,24 @@ test("default wiring has no per-prompt, per-edit or Stop automation", () => {
   for (const file of [".claude/settings.json", ".codex/hooks.json"]) {
     const { hooks } = JSON.parse(fs.readFileSync(path.join(ROOT, file), "utf8"));
     assert.deepEqual(Object.keys(hooks).sort(), ["PreToolUse", "SessionStart"]);
+  }
+});
+
+test("Codex start guidance preserves platform distinctions after paragraph reflow", () => {
+  const source = fs.readFileSync(path.join(ROOT, ".claude/skills/start/SKILL.md"), "utf8");
+  for (const text of [source, source.replace(/\n +/g, " ")]) {
+    const output = platformText(text, { requireStartRules: true });
+    assert.match(output, /preserving the template's explicit shared-core reference/);
+    assert.match(output, /Codex does not automatically load Claude path rules/);
+    assert.match(output, /`\.agents\/skills\/<stack>\/SKILL\.md`/);
+    assert.doesNotMatch(output, /as the first line|activate on their own/);
+  }
+});
+
+test("changed start instructions must not silently bypass required platform translations", () => {
+  const source = fs.readFileSync(path.join(ROOT, ".claude/skills/start/SKILL.md"), "utf8");
+  for (const text of [source.replace("as the first line", "at the top"), source.replace("activate on their own", "load automatically"), `${source}\n${source}`]) {
+    assert.throws(() => platformText(text, { requireStartRules: true }), /required.*translation/i);
   }
 });
 

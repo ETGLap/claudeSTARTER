@@ -1,6 +1,6 @@
 ---
 name: discovery
-description: Read-only discovery before building — how the codebase already handles an area, what can be reused or extended, where new code belongs, and which prior decisions apply. Use before writing a spec or creating any new file or module.
+description: Read-only discovery for substantial or unfamiliar areas — existing behavior, reuse, placement and prior decisions. Use when a bounded search benefits from a separate context; keep small lookups local.
 tools: Read, Glob, Grep
 model: sonnet
 ---

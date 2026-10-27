@@ -112,3 +112,45 @@ Remaining recommendations: keep graph results advisory; add language parsers onl
 need. Validate host model access/rates before enabling routing. Review stack advice against
 the chosen project's versions. Maintain explicit host permission coverage instead of expanding
 shell regexes into an interpreter. Preserve the historical ADR/spec record.
+
+## Confirmed reliability and consistency fixes — 2026-10-26
+
+Authorization: implement the six confirmed findings from the follow-up audit, preserve the
+architecture and testing safeguards, avoid speculative changes, update docs and verify.
+This is a focused correction pass; the prior decisions and historical acceptance records
+above remain unchanged. Related: [[architecture]], [[token-costs]].
+
+- Shared hook exceptions: report a fixed, non-blocking unverified-check warning. Never emit
+  exception messages, stack traces or payload data. Existing guard decisions are unchanged.
+- Startup: require the documented root workflow reference plus a filled context purpose;
+  check the active host's Claude or Codex root template, not the other host's wiring.
+  Keep the starter's shipping template blank,
+  recognizing the source checkout by its two root maintenance scripts. Inspect only root
+  instruction/context files and fixed markers; no recursive scan or state writes.
+- Security reviewer: distinguish salted adaptive password hashing from retrievable secrets
+  stored in a secret manager or encrypted with separately protected keys. Sources:
+  [OWASP password storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
+  and [cryptographic storage](https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html).
+- Discovery: align its advertised trigger with bounded delegation; small lookups remain local.
+  This removes contradictory guidance, not a measured claim of model-cost savings.
+- Rules: include conventional Go/Python `_test`, Python `test_` and Ruby `_spec` filenames.
+  Adoption checks actual host layouts; unrelated source files must not activate test rules.
+- Adapters: tolerate whitespace changes in required `/start` translations and reject missing
+  or duplicate matches. Test platform meaning separately from generated-file parity.
+
+Verification plan: reproduce changed runtime behavior before fixing; run the complete kit
+suite, adapter parity, wiring/import/config validation, JavaScript syntax and TOML/JSON
+parsing, and diff whitespace checks. Review the scoped diff independently for safety and
+correctness. Interactive host loading remains a separate manual check; no new host session
+or paid workflow benchmark is part of this pass.
+
+Results: the initial focused run failed on all six expected regression cases. Independent
+review then found cross-host setup masking and a shared-core filename suffix false positive;
+both were reproduced with failing checks and corrected. The follow-up review found no
+remaining concrete issues. Final verification: 98 tests pass, none skipped (about 5.7 seconds
+locally); all 39 tracked JavaScript files pass syntax checks; six JSON and seven agent TOML
+files parse; generated adapters match; wiring/import/resource/configuration and whitespace
+checks pass. The always-loaded instruction footprint remains 6,128 characters. No runtime
+dependencies, default hook registrations, guard decisions or testing-policy requirements
+changed. Generated adapters were regenerated from canonical sources. Live host loading and
+OS notification behavior were not exercised; copied-host subprocess integration checks pass.

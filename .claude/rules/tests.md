@@ -1,6 +1,9 @@
 ---
 paths:
   - "**/*.{test,spec}.{js,jsx,ts,tsx,py,go,rb}"
+  - "**/*_test.{go,py}"
+  - "**/test_*.py"
+  - "**/*_spec.rb"
   - "tests/**"
   - "__tests__/**"
 ---

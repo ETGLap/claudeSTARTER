@@ -13,12 +13,22 @@ function walk(dir) {
     entry.isDirectory() ? (entry.name === "fixtures" ? [] : walk(`${dir}/${entry.name}`)) : [`${dir}/${entry.name}`]);
 }
 
-function platformText(text) {
-  return text.replaceAll("`CLAUDE.md`", "`AGENTS.md`")
+function platformText(text, { requireStartRules = false } = {}) {
+  let output = text.replaceAll("`CLAUDE.md`", "`AGENTS.md`")
     .replaceAll(".claude/templates/claude-root.md", ".claude/templates/agents-root.md")
-    .replace("keeping\n  `@.claude/CLAUDE.md` as the first line.", "preserving the template's explicit shared-core reference.")
-    .replaceAll("`.claude/skills/<stack>/SKILL.md`", "`.agents/skills/<stack>/SKILL.md`")
-    .replace("Check `.claude/rules/`: the shipped rules are path-scoped and activate on their own, but\n  adjust a glob if this project's layout would miss it.", "Read the applicable `.claude/rules/` explicitly; Codex does not automatically load Claude path rules.");
+    .replaceAll("`.claude/skills/<stack>/SKILL.md`", "`.agents/skills/<stack>/SKILL.md`");
+  // Whitespace may change during editing; changed semantics require a translation review.
+  const startRules = [
+    [/keeping\s+`@\.claude\/CLAUDE\.md`\s+as\s+the\s+first\s+line\./g, "preserving the template's explicit shared-core reference."],
+    [/Check\s+`\.claude\/rules\/`:\s+the\s+shipped\s+rules\s+are\s+path-scoped\s+and\s+activate\s+on\s+their\s+own,\s+but\s+adjust\s+a\s+glob\s+if\s+this\s+project's\s+layout\s+would\s+miss\s+it\./g, "Read the applicable `.claude/rules/` explicitly; Codex does not automatically load Claude path rules."],
+  ];
+  for (const [pattern, replacement] of startRules) {
+    if (requireStartRules && [...output.matchAll(pattern)].length !== 1) {
+      throw new Error("Required Codex start translation did not match exactly once; review the canonical start instructions.");
+    }
+    output = output.replace(pattern, replacement);
+  }
+  return output;
 }
 
 function generatedFiles() {
@@ -27,7 +37,7 @@ function generatedFiles() {
     files.set(source.replace(".claude/", ".codex/"), `// ${generated}\n"use strict";\nrequire("../../.claude/hooks/lib/codex.js").runCodexHook(${JSON.stringify(path.basename(source))});\n`);
   }
   for (const source of walk(".claude/skills").filter((file) => file.endsWith("/SKILL.md"))) {
-    const text = platformText(read(source));
+    const text = platformText(read(source), { requireStartRules: source === ".claude/skills/start/SKILL.md" });
     const end = text.indexOf("\n---", 3) + 4;
     files.set(source.replace(".claude/", ".agents/"), text.slice(0, end) + `\n\n<!-- ${generated} -->` + text.slice(end));
   }

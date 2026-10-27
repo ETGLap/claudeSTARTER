@@ -32,10 +32,50 @@ test("session start distinguishes genesis, retrofit, and configured projects", (
   assert.match(context(h.run("session-start.js")), /\/start/);
   h.write("package.json", "{}");
   assert.match(context(h.run("session-start.js")), /maintain project/);
+  h.write("CLAUDE.md", "# Existing project instructions");
+  assert.match(context(h.run("session-start.js")), /maintain project/);
   h.write("CLAUDE.md", "@.claude/CLAUDE.md");
+  assert.match(context(h.run("session-start.js")), /maintain project/);
+  h.write(".claude/context/project-context.md", "- **Purpose:** Manage sample inventory.\n");
   assert.doesNotMatch(context(h.run("session-start.js")), /maintain project|\/start/);
   assert.equal(h.run("session-start.js").json, null);
   assert.equal(fs.existsSync(path.join(h.kit, ".state")), false);
+});
+
+test("Claude startup requires its own workflow wiring even when Codex is configured", (t) => {
+  const h = host(t);
+  h.write("package.json", "{}");
+  h.write(".claude/context/project-context.md", "- **Purpose:** Manage sample inventory.\n");
+  assert.match(context(h.run("session-start.js")), /maintain project/);
+  h.write("AGENTS.md", "Read `.claude/CLAUDE.md` for the shared workflow.");
+  assert.match(context(h.run("session-start.js")), /maintain project/);
+  h.write("CLAUDE.md", "# Existing project instructions");
+  assert.match(context(h.run("session-start.js")), /maintain project/);
+  h.write("CLAUDE.md", "@.claude/CLAUDE.md");
+  assert.equal(h.run("session-start.js").json, null);
+});
+
+test("starter maintenance checkout keeps its blank shipping context without bootstrap prompts", (t) => {
+  const h = host(t);
+  h.write("CLAUDE.md", "@.claude/CLAUDE.md");
+  h.write("scripts/sync-adapters.js", "// starter maintenance");
+  h.write("scripts/validate-kit.js", "// starter maintenance");
+  assert.equal(h.run("session-start.js").json, null);
+  assert.equal(fs.existsSync(path.join(h.kit, ".state")), false);
+});
+
+test("unexpected hook failures report unverified checks without exposing exception details", (t) => {
+  const h = host(t);
+  for (const body of ["() => { throw new Error('private-fixture-value'); }", "async () => { throw new Error('private-fixture-value'); }"]) {
+    h.write(".claude/hooks/failing.js", `require('./lib/io').run(${body});`);
+    const result = h.run("failing.js");
+    assert.equal(result.code, 0);
+    assert.match(result.json?.systemMessage || "", /hook.*failed/i);
+    assert.match(result.json?.systemMessage || "", /unverified/i);
+    assert.equal(result.json?.decision, undefined);
+    assert.equal(result.json?.hookSpecificOutput?.permissionDecision, undefined);
+    assert.doesNotMatch(JSON.stringify(result), /private-fixture-value/);
+  }
 });
 
 test("unconfigured formatter and notifier remain silent", (t) => {

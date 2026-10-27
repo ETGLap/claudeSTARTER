@@ -35,7 +35,8 @@ const additionalContext = (hookEventName, text) => ({
 
 /**
  * Run a hook body. Whatever it resolves to is emitted as JSON; null/undefined emits
- * nothing. Any throw is swallowed. The process always exits 0.
+ * nothing. Unexpected failures emit a generic warning without exception or payload data.
+ * The process always exits 0; this does not change the hook's blocking policy.
  */
 async function run(body) {
   try {
@@ -43,7 +44,7 @@ async function run(body) {
     const output = await body(payload);
     if (output) process.stdout.write(JSON.stringify(output));
   } catch {
-    /* never break the session */
+    process.stdout.write(JSON.stringify({ systemMessage: "Conductor hook failed unexpectedly; its check is unverified. Review the hook before relying on it." }));
   } finally {
     process.exit(0);
   }

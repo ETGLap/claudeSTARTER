@@ -37,6 +37,8 @@ counts; commits and fresh sessions are not mandatory workflow steps.
 | Project knowledge and decisions | Host `docs-vault/`; stable decisions are append-only ADRs |
 
 The active agent is discovery. Tests/code stay in the main session unless requested otherwise.
+Use discovery for substantial or unfamiliar searches that benefit from a separate context;
+small lookups stay local. During adoption, check rule patterns against the host's layout.
 Enable a stack by copying its template into `.claude/skills/<stack>/SKILL.md`.
 Real env/key files are protected on supported operations; `.env.example` holds only variable
 names and empty/obviously fake values. Path checks cannot prove content is secret-free.
