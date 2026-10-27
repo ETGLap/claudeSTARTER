@@ -1,0 +1,35 @@
+{
+  "testGate": {
+    "enabled": false,
+    "command": "",
+    "maxBlocks": 2,
+    "cache": false,
+    "timeoutMs": 300000
+  },
+  "format": {
+    "enabled": false,
+    "command": ""
+  },
+  "guards": {
+    "adrAppendOnly": true,
+    "implementedSpecs": true,
+    "secretFiles": true,
+    "recursiveDelete": true,
+    "forcePush": true,
+    "defaultBranchCommit": true
+  },
+  "notify": {
+    "enabled": false,
+    "sound": true,
+    "events": {
+      "stop": true,
+      "notification": true
+    },
+    "includeProjectName": true,
+    "messages": {
+      "stop": "Turn stopped",
+      "notification": null
+    }
+  },
+  "injectContext": true
+}

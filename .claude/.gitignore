@@ -1,0 +1,3 @@
+# Machine-local session bookkeeping — never shared. This file travels with the kit,
+# unlike the host project's root .gitignore, so the ledger stays out of git everywhere.
+.state/

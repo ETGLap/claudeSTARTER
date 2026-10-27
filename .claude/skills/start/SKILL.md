@@ -1,0 +1,87 @@
+---
+name: start
+description: Take a new or empty project from a one-line description to a scaffolded, test-wired skeleton — classify, triage requirements, decide the stack as an ADR, scaffold the toolchain, then hand off to /sdd. Use when the repository has no application code yet, or when the user describes building something from scratch.
+argument-hint: <what to build>
+---
+
+# /start
+
+Project genesis: from a description to a skeleton that a test command can run. This is the
+**one** time the kit scaffolds. It never generates features — after the hand-off, subsequent work follows the core light/standard/high-risk routing.
+
+Genesis is exempt from Red-Green because a failing test cannot exist
+before a test runner does. The exemption ends the moment step 5 passes; say so in the report.
+
+**Do not run this on a project that already has application code** — that is `/maintain
+project`, which retrofits an existing codebase. Inspect the actual toolchain and source; an existing instruction file alone does not
+make an empty project an application. Preserve existing project instructions.
+
+## 1. Classify
+
+Restate `$ARGUMENTS`. Establish, from the request where possible and by asking where not:
+
+- **Type** — website · SPA · full-stack app · API · mobile · game · CLI/library
+- **Intent** — prototype or production-oriented. This scales everything downstream.
+- **Platform(s)** — and whether more than one is genuinely required
+- **Scale** — rough size and expected lifetime
+
+Ask only material questions the request does not answer; group related questions.
+Use established preferences for routine reversible choices.
+
+## 2. Triage
+
+Establish testable outcomes and necessary inferred requirements from the request. Explain
+material inferences; leave optional enhancements outside scope. Clarify only gaps that change
+behavior, risk, scale or an expensive decision. Reuse prior agreement.
+
+## 3. Decide
+
+Honor a stack already chosen by the user. For an unresolved material stack choice, use
+the optional `stack-advisor`, if installed and independent advice helps; present two or three options and a recommendation.
+
+Once the choice is authorized, write the genesis ADR to `docs-vault/decisions/NNNN-stack.md` (next available number) from
+`.claude/templates/docs/decision.md`: context (the request and its constraints), decision
+(the stack), consequences (what it costs and what it forecloses). This is the one
+architectural decision every later spec inherits, so it gets a record.
+
+## 4. Scaffold
+
+Create the minimal skeleton for the chosen type from `.claude/reference/architectures.md`.
+
+**Toolchain and structure only.** No feature code, no CRUD, no components beyond what the
+framework's own entry point requires. Honour the "Do not create" list for that type — those
+are abstractions that cost more to remove later than to add now.
+
+Prefer the ecosystem's official scaffolder (`create-next-app`, `create-expo-app`, `npm init`)
+over hand-writing config. Read what it generated; delete what the project does not need.
+
+## 5. Establish verification — this is the genesis exit condition
+
+- Record the actual test and formatter commands in project context. Leave automatic hooks
+  disabled unless requested; a configured command alone does not enable them.
+- Run the actual test runner and read its output. An empty suite is fine if the runner
+  confirms it executed successfully; an arbitrary command returning zero is not verification.
+- Run the formatter once across the skeleton.
+
+Until the test command exits 0, genesis is not finished — do not proceed to step 6.
+
+## 6. Establish context
+
+- Create or merge the root `CLAUDE.md` from `.claude/templates/claude-root.md`, keeping
+  `@.claude/CLAUDE.md` as the first line. Philosophy, conventions, and domain rules only —
+  never a directory listing or a dependency list, which Claude derives from the code.
+- Fill `.claude/context/project-context.md`: purpose, stack, commands, architecture, risks.
+- Copy the matching pack from `.claude/templates/stacks/` to
+  `.claude/skills/<stack>/SKILL.md`. If no pack matches, say so — do not invent one.
+- Check `.claude/rules/`: the shipped rules are path-scoped and activate on their own, but
+  adjust a glob if this project's layout would miss it.
+
+## 7. Hand off
+
+Genesis is over. State that explicitly, and route later work through the core risk/size guidance.
+
+The first feature goes through `/sdd <idea>` → `/implement`. Continue when the user
+requested the build. Recommend a fresh session for a high-risk handoff, not routinely.
+
+Report: created · decided (with the ADR link) · inferred-and-built (with why) ·
+not verified · risks.

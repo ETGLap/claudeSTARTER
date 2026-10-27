@@ -1,0 +1,46 @@
+[
+  {
+    "id": "claude-haiku-4-5-20251001",
+    "host": "claude",
+    "tier": 1,
+    "available": false,
+    "validated": false,
+    "verifiedAt": null,
+    "inputPerMillion": 1,
+    "outputPerMillion": 5,
+    "maxContext": null
+  },
+  {
+    "id": "claude-sonnet-5",
+    "host": "claude",
+    "tier": 2,
+    "available": false,
+    "validated": false,
+    "verifiedAt": null,
+    "inputPerMillion": 2,
+    "outputPerMillion": 10,
+    "maxContext": null
+  },
+  {
+    "id": "claude-opus-5",
+    "host": "claude",
+    "tier": 3,
+    "available": false,
+    "validated": false,
+    "verifiedAt": null,
+    "inputPerMillion": 5,
+    "outputPerMillion": 25,
+    "maxContext": null
+  },
+  {
+    "id": "claude-fable-5-1",
+    "host": "claude",
+    "tier": 4,
+    "available": false,
+    "validated": false,
+    "verifiedAt": null,
+    "inputPerMillion": 10,
+    "outputPerMillion": 50,
+    "maxContext": null
+  }
+]

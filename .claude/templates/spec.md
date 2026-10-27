@@ -21,7 +21,8 @@ before. Not implementation; outcomes.
 ## 3. Constraints
 
 Project-specific rules that limit *how* this may work — only ones unique to this feature.
-Global/standing constraints live in `CLAUDE.md` / `project-context.md`; link, don't repeat.
+Global/standing constraints live in the root `CLAUDE.md` / `project-context.md`; link,
+don't repeat.
 
 - <constraint, e.g. "must reuse the existing auth middleware">
 

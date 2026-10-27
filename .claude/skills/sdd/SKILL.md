@@ -1,0 +1,28 @@
+---
+name: sdd
+description: Write a six-element behavior spec for a substantial feature, endpoint, UI flow, schema or infrastructure change. Small fixes and documentation edits use the light workflow.
+argument-hint: <idea>
+---
+
+# /sdd
+
+1. Scope — classify the change as light, standard, or high risk using the kit core. For
+   light work, record expected behavior and verification in a short plan; skip a formal spec.
+   For a new project without a toolchain, use `/start` first.
+2. Discover — inspect relevant existing behavior, reusable code, constraints and decisions.
+   Use the discovery agent for a broad search; handle small lookups locally.
+3. Clarify — fill what the request and code already establish. Ask only unresolved questions
+   that materially change outcomes, scope, constraints or verification. Group related questions;
+   there is no required six-round interview. Do not invent a domain requirement.
+4. Draft — use `.claude/templates/spec.md` in `docs-vault/specs/NNNN-<slug>.md`.
+   Include outcomes, in/out scope, feature constraints, linked prior decisions, tasks and
+   verification. Each observable outcome needs automated, manual or acceptance evidence.
+   Keep tasks about behavior, scope explicit, and global rules linked instead of repeated.
+5. Approve — present the concrete spec. Mark approved when the user approves the scope,
+   including existing approval to implement an agreed proposal. Record that authorization.
+6. Continue — follow the user's request to implement. For high-risk work or a spec intended
+   for another developer, recommend a fresh implementation session to test completeness.
+   If continuing here, identify missing assumptions explicitly; a fresh session is optional.
+
+During implementation, correct discovered gaps against the agreed intent. Material scope
+changes need clarification; implemented specs are superseded by new ones.

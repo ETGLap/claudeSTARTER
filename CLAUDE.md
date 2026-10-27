@@ -1,78 +1,32 @@
-# Conductor
+@.claude/CLAUDE.md
 
-Quality system around Claude the builder: verify code before, during, and after changes.
-Not an app generator — never create feature/backend/frontend/api/db/ui generators.
+# Conductor Starter
 
-## Rules
+Development repository for the portable `.claude/` kit, not a host application.
+The optional Codex adapters share that canonical source. See `docs-vault/README.md`.
 
-- Plan before editing. Smallest safe change; no unrelated edits or refactors; new files
-  or deps need a reason.
-- Ambiguous, conflicting, or missing requirement → ask one focused question before coding;
-  never guess.
-- TDD is the center: a failing test before production code (Red → Green → Refactor). If a
-  test is impossible, document manual verification.
-- Spec before building: any new feature, endpoint, UI flow, schema/infra change, command, or
-  behavior-changing refactor gets a short spec first (`.claude/templates/spec.md` →
-  `docs-vault/specs/`) — outcomes, scope, and verification criteria before code. Bug fixes,
-  spikes, reverse-engineering, docs-only, and behavior-preserving refactors skip it; when
-  unsure, write a one-paragraph mini-spec. Global constraints live here and in
-  `project-context.md`, never repeated in each spec. Specs describe behavior, not implementation.
-- Scale ceremony to risk: no-behavior changes (docs, comments, config text) skip Red-Green
-  but still get verification and the report.
-- Reuse first: search for existing code and patterns to reuse or extend; a duplicate is
-  the last resort.
-- Delegate exploration: information-gathering runs in read-only subagents that return a
-  concise brief; implementation stays in the main session (`policy/delegation.md`).
-- Follow existing project patterns and naming.
-- Run tests/lint/build when available; read the output. Tests must pass before done.
-- Never claim verification that did not occur; report unverified parts honestly.
+## Project conventions
 
-## Pipeline (automatic, every build/change)
+- Zero runtime dependencies: Node built-ins only. No host package.json or install step.
+- Keep hook decisions testable in `.claude/hooks/lib/`; entry points handle execution.
+  Hooks exit 0 and use supported JSON responses. Important failures must be visible.
+- Test with `node --test .claude/hooks/*.test.js .claude/tools/*.test.js`; explicit globs include dot-directories.
+  Validate wiring and generated adapters with `node scripts/validate-kit.js`.
+- Shared implementation lives in `.claude/`; regenerate `.codex/` and `.agents/` adapters
+  with `node scripts/sync-adapters.js`. Do not independently edit generated files.
+- Conventional Commits when authorized. Do not commit directly to main or rewrite history
+  without approval. Keep edits limited to the requested work.
 
-Reviewers are lenses while you work, gates before you move on.
+Optimization implementation lives in `.claude/tools/`; operating rules are linked from the
+imported core. Research and acceptance evidence live in `docs-vault/optimization-research.md`.
 
-1. Context — this file · `.claude/context/project-context.md` · nearest local `CLAUDE.md`.
-2. Plan — if spec-worthy, write or locate the spec (`/spec`, `reviewers/spec.md`); its
-   verification criteria seed the tests · analyze the requirement and expected behavior ·
-   run relevant existing tests (green baseline) · discover & reuse/extend
-   (`reviewers/architecture.md`) · if the change site needs restructuring first, propose a
-   prep refactor · plan tests (`reviewers/tdd.md`) · judge effort (`policy/model-policy.md`) ·
-   write the failing test (Red).
-3. Code — smallest change that passes (Green).
-4. Review — refactor your own change while green (`reviewers/refactoring.md`) · quality
-   (`reviewers/quality.md`) · security (`reviewers/security.md`) · placement
-   (`reviewers/architecture.md`) · re-run tests.
-5. Finish — final gate (`reviewers/final.md`) · propose `/docs` if behavior or interfaces
-   changed · flag stale `project-context.md` if stack/commands/architecture/deps changed.
-6. Report — changed · tested · not verified · risks. Short and honest.
+## Shipping boundaries
 
-Refactor freely within your own change (step 4). Pre-existing or unrelated code only on
-explicit request — behavior-preserving and test-gated (`reviewers/refactoring.md`).
-
-## Commands
-
-- `/spec` — draft/verify a spec (six elements) before building; specs live in
-  `docs-vault/specs/`. Describe behavior and outcomes, not implementation.
-- `/docs` — audit docs vs code, update `docs-vault/` from `.claude/templates/docs/`
-  (propose first; never overwrite human prose; ADRs append-only).
-- `/maintain` — trim the `.claude/` system + refresh `project-context.md`.
-- `/modernize` — one-time retrofit of an existing project to Conductor standards
-  (audit → plan → apply on approval).
-
-## Hooks (`.claude/settings.json`)
-
-- `UserPromptSubmit` → `pipeline-inject.js` — keeps the pipeline in context every turn.
-- `Stop` → `test-gate.js` — blocks "done" while tests are red; opt-in via
-  `.claude/pipeline.config.json` (`testCommand` + `enabled:true`).
-- `Stop`/`Notification` → `notify.js` — desktop notify, opt-in (see `.claude/notify/README.md`).
-
-## Local CLAUDE.md
-
-Create one only where a folder has unique rules: architecture, framework, local commands,
-security, naming, or domain logic. Content: purpose · conventions · commands · risks.
-Don't repeat root rules.
-
-## Scaling
-
-Add to `.claude/` only on repeated need — reusable, prevents future mistakes, worth the
-tokens. Never for one-offs.
+- `.claude/context/project-context.md` stays blank: it is the host-project template.
+- Everything under `.claude/` travels; starter-only tools and evidence belong in root
+  `scripts/` and `docs-vault/`. No machine-local paths in distributed files.
+- Root README describes kit development; `.claude/README.md` explains host usage.
+- Validate hook settings after changes. Prefer narrow supported guards to broad regexes;
+  every widened pattern needs a positive regression and harmless negative examples.
+- `.claude/.state/` is disposable session bookkeeping, ignored by Git. Tests use isolated
+  copies and must not read, back up, or overwrite the live ledger.

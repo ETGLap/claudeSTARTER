@@ -1,0 +1,26 @@
+name: test
+
+on:
+  push:
+    branches: [main, development]
+  pull_request:
+
+jobs:
+  kit:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # Explicit globs include the dot-directory and the starter maintenance tests.
+      - run: node --test .claude/hooks/*.test.js .claude/tools/*.test.js scripts/*.test.js
+      - run: node scripts/validate-kit.js
+      - name: Parse generated Codex agent configuration
+        run: python3 -c "import pathlib,tomllib; [tomllib.loads(p.read_text()) for p in pathlib.Path('.codex').glob('agents*/*.toml')]"
